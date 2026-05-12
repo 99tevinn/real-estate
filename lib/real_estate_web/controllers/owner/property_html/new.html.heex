@@ -1,0 +1,33 @@
+<%!-- owner/property_html/new.html.heex --%>
+<div class="mx-auto max-w-lg mt-10 p-6">
+  <h1 class="text-2xl font-semibold mb-6">List a New Property</h1>
+  
+  <.form :let={f} for={@changeset} action={~p"/owner/properties"} method="post" multipart={true}>
+    <.input field={f[:title]} type="text" label="Title" required />
+    <.input field={f[:description]} type="textarea" label="Description" />
+    <.input field={f[:location]} type="text" label="Location" required />
+    <.input field={f[:price]} type="number" label="Price (KES)" required />
+    <.input
+      field={f[:type]}
+      type="select"
+      label="Listing Type"
+      options={[{"For Sale", "sale"}, {"For Rent", "rent"}]}
+    />
+    <.input
+      field={f[:status]}
+      type="select"
+      label="Status"
+      options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]}
+    />
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Property Image</label>
+      <input
+        type="file"
+        name="property[image]"
+        accept=".jpg,.jpeg,.png,.webp"
+        class="w-full text-sm"
+      />
+    </div>
+     <.button type="submit" class="w-full mt-4">List Property</.button>
+  </.form>
+</div>

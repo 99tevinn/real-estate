@@ -1,0 +1,22 @@
+<%!-- registration_html/new.html.heex --%>
+<div class="mx-auto max-w-sm mt-16">
+  <h1 class="text-2xl font-semibold mb-6">Create an account</h1>
+
+  <.form :let={f} for={@changeset} action={~p"/register"} method="post">
+    <.input field={f[:full_name]} type="text" label="Full name" />
+    <.input field={f[:email]} type="email" label="Email" required />
+    <.input field={f[:password]} type="password" label="Password" required />
+    <.input field={f[:role]} type="select" label="I am a ..."
+      options={[
+        {"Buyer / Tenant", "buyer"},
+        {"Property Owner", "owner"},
+        {"Agent / Realtor", "agent"}
+      ]} />
+    <.button type="submit" class="w-full mt-4">Create account</.button>
+  </.form>
+
+  <p class="mt-4 text-sm text-center">
+    Already have an account?
+    <.link href={~p"/login"}>Sign in</.link>
+  </p>
+</div>

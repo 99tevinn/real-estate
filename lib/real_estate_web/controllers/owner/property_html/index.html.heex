@@ -1,0 +1,35 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">My Properties</h1>
+    <.link href={~p"/owner/properties/new"} class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+      + Add Property
+    </.link>
+  </div>
+
+  <table class="w-full text-sm border">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="p-2 text-left">Title</th>
+        <th class="p-2 text-left">Location</th>
+        <th class="p-2 text-left">Price (KES)</th>
+        <th class="p-2 text-left">Type</th>
+        <th class="p-2 text-left">Status</th>
+        <th class="p-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr :for={prop <- @properties} class="border-t">
+        <td class="p-2"><%= prop.title %></td>
+        <td class="p-2"><%= prop.location %></td>
+        <td class="p-2"><%= prop.price %></td>
+        <td class="p-2 capitalize"><%= prop.type %></td>
+        <td class="p-2 capitalize"><%= prop.status %></td>
+        <td class="p-2">
+          <.link href={~p"/owner/properties/#{prop.id}/edit"} class="text-blue-600">
+            Edit
+          </.link>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,30 @@
+<%!-- lib/real_estate_web/live/owner/dashboard_live.html.heex --%>
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Owner Dashboard</h1>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div>
+      <h2 class="text-lg font-medium mb-3">My Properties</h2>
+      <ul class="space-y-2">
+        <li :for={prop <- @properties} class="border rounded p-3 text-sm">
+          <p class="font-medium"><%= prop.title %></p>
+          <p class="text-gray-500"><%= prop.location %> · KES <%= prop.price %></p>
+        </li>
+      </ul>
+      <.link href={~p"/owner/properties/new"} class="mt-3 inline-block text-sm text-blue-600">
+        + Add property
+      </.link>
+    </div>
+
+    <div>
+      <h2 class="text-lg font-medium mb-3">Enquiries on My Properties</h2>
+      <ul class="space-y-2">
+        <li :for={enq <- @enquiries} class="border rounded p-3 text-sm">
+          <p class="font-medium"><%= enq.property.title %></p>
+          <p class="text-gray-500 truncate"><%= enq.message %></p>
+          <span class="text-xs text-gray-400"><%= enq.status %></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

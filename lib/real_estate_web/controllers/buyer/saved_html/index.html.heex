@@ -1,0 +1,48 @@
+<%!-- lib/real_estate_web/controllers/buyer/saved_html/index.html.heex --%>
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Saved Properties</h1>
+
+  <%= if Enum.empty?(@saved) do %>
+    <div class="text-center py-16">
+      <p class="text-gray-400 mb-4">No saved properties yet.</p>
+      <.link href={~p"/listings"} class="text-blue-600 text-sm">
+        Browse listings →
+      </.link>
+    </div>
+  <% else %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div :for={saved <- @saved} class="border rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class={[
+            "text-xs px-2 py-0.5 rounded font-medium",
+            saved.property.type == "sale" && "bg-blue-100 text-blue-700",
+            saved.property.type == "rent" && "bg-green-100 text-green-700"
+          ]}>
+            <%= if saved.property.type == "sale", do: "For Sale", else: "For Rent" %>
+          </span>
+          <span class="text-xs text-gray-400 capitalize">
+            <%= saved.property.status %>
+          </span>
+        </div>
+
+        <h3 class="font-semibold text-base mb-1"><%= saved.property.title %></h3>
+        <p class="text-gray-500 text-sm mb-1"><%= saved.property.location %></p>
+        <p class="text-lg font-bold mb-3">KES <%= saved.property.price %></p>
+
+        <div class="flex gap-2">
+          <.link href={~p"/listings/#{saved.property.id}"}
+            class="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-sm py-2 rounded">
+            View
+          </.link>
+          <.link
+            href={~p"/buyer/saved/#{saved.property_id}"}
+            method="delete"
+            data-confirm="Remove from saved?"
+            class="flex-1 text-center bg-red-50 hover:bg-red-100 text-red-600 text-sm py-2 rounded">
+            Remove
+          </.link>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

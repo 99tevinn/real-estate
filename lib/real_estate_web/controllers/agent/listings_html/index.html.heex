@@ -1,0 +1,48 @@
+<%!-- lib/real_estate_web/controllers/agent/listing_html/index.html.heex --%>
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">My Listings</h1>
+    <.link href={~p"/agent/listings/new"}
+      class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+      + New Listing
+    </.link>
+  </div>
+
+  <%= if Enum.empty?(@listings) do %>
+    <p class="text-gray-400 text-center py-16">No listings yet.</p>
+  <% else %>
+    <table class="w-full text-sm border">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="p-2 text-left">Title</th>
+          <th class="p-2 text-left">Location</th>
+          <th class="p-2 text-left">Price (KES)</th>
+          <th class="p-2 text-left">Type</th>
+          <th class="p-2 text-left">Status</th>
+          <th class="p-2 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr :for={listing <- @listings} class="border-t">
+          <td class="p-2"><%= listing.title %></td>
+          <td class="p-2"><%= listing.location %></td>
+          <td class="p-2"><%= listing.price %></td>
+          <td class="p-2 capitalize"><%= listing.type %></td>
+          <td class="p-2 capitalize"><%= listing.status %></td>
+          <td class="p-2 flex gap-3">
+            <.link href={~p"/agent/listings/#{listing.id}/edit"} class="text-blue-600">
+              Edit
+            </.link>
+            <.link
+              href={~p"/agent/listings/#{listing.id}"}
+              method="delete"
+              data-confirm="Delete this listing?"
+              class="text-red-600">
+              Delete
+            </.link>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+</div>

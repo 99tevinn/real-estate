@@ -1,0 +1,31 @@
+<%!-- lib/real_estate_web/live/agent/dashboard_live.html.heex --%>
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Agent Dashboard</h1>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div>
+      <h2 class="text-lg font-medium mb-3">My Listings</h2>
+      <ul class="space-y-2">
+        <li :for={listing <- @listings} class="border rounded p-3 text-sm">
+          <p class="font-medium"><%= listing.title %></p>
+          <p class="text-gray-500"><%= listing.location %> · KES <%= listing.price %></p>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="text-lg font-medium mb-3">
+        Pending Enquiries
+        <span class="ml-2 bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded">
+          <%= length(@pending_enquiries) %>
+        </span>
+      </h2>
+      <ul class="space-y-2">
+        <li :for={enq <- @pending_enquiries} class="border rounded p-3 text-sm">
+          <p class="font-medium"><%= enq.property.title %></p>
+          <p class="text-gray-500 truncate"><%= enq.message %></p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

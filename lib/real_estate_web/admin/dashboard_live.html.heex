@@ -1,0 +1,54 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">Admin Dashboard</h1>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="border rounded p-4 text-center">
+      <p class="text-3xl font-bold"><%= @total_users %></p>
+      <p class="text-sm text-gray-500 mt-1">Total Users</p>
+    </div>
+
+    <div class="border rounded p-4 text-center">
+      <p class="text-3xl font-bold"><%= @total_properties %></p>
+      <p class="text-sm text-gray-500 mt-1">Total Properties</p>
+    </div>
+
+    <div class="border rounded p-4 text-center">
+      <p class="text-3xl font-bold"><%= @total_enquiries %></p>
+      <p class="text-sm text-gray-500 mt-1">Total Enquiries</p>
+    </div>
+  </div>
+
+  <!-- Recent Registrations Table -->
+  <div class="mt-8">
+    <h2 class="text-lg font-medium mb-4">Recent Registrations</h2>
+
+    <%= if @recent_users == [] do %>
+      <div class="border rounded p-8 text-center text-gray-500">
+        No recent registrations
+      </div>
+    <% else %>
+      <table class="w-full text-sm border">
+        <thead>
+          <tr class="bg-gray-100">
+            <th scope="col" class="p-2 text-left">Name</th>
+            <th scope="col" class="p-2 text-left">Email</th>
+            <th scope="col" class="p-2 text-left">Role</th>
+            <th scope="col" class="p-2 text-left">Joined</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <%= for user <- @recent_users do %>
+            <tr class="border-t">
+              <td class="p-2"><%= user.full_name %></td>
+              <td class="p-2"><%= user.email %></td>
+              <td class="p-2 capitalize"><%= user.role %></td>
+              <td class="p-2"><%= Calendar.strftime(user.inserted_at, "%d %b %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>

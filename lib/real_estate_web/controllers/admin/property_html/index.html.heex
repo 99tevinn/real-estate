@@ -1,0 +1,37 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">All Properties</h1>
+
+  <table class="w-full text-sm border">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="p-2 text-left">Title</th>
+        <th class="p-2 text-left">Owner</th>
+        <th class="p-2 text-left">Location</th>
+        <th class="p-2 text-left">Price (KES)</th>
+        <th class="p-2 text-left">Status</th>
+        <th class="p-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr :for={prop <- @properties} class="border-t">
+        <td class="p-2"><%= prop.title %></td>
+        <td class="p-2"><%= prop.owner.full_name %></td>
+        <td class="p-2"><%= prop.location %></td>
+        <td class="p-2"><%= prop.price %></td>
+        <td class="p-2 capitalize"><%= prop.status %></td>
+        <td class="p-2 flex gap-3">
+          <.link href={~p"/admin/properties/#{prop.id}/edit"} class="text-blue-600">
+            Edit
+          </.link>
+          <.link
+            href={~p"/admin/properties/#{prop.id}"}
+            method="delete"
+            data-confirm="Permanently delete this property?"
+            class="text-red-600">
+            Delete
+          </.link>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

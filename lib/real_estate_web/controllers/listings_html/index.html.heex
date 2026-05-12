@@ -1,0 +1,70 @@
+<div class="max-w-6xl mx-auto px-6 py-10">
+  <h1 class="text-2xl font-semibold mb-6">Available Properties</h1>
+
+  <%!-- Filters --%>
+  <form action={~p"/listings"} method="get" class="flex flex-wrap gap-3 mb-8">
+    <select name="type" class="border rounded px-3 py-2 text-sm">
+      <option value="">All Types</option>
+      <option value="sale" selected={@filters["type"] == "sale"}>For Sale</option>
+      <option value="rent" selected={@filters["type"] == "rent"}>For Rent</option>
+    </select>
+    <input
+      type="text"
+      name="location"
+      value={@filters["location"]}
+      placeholder="Search by location..."
+      class="border rounded px-3 py-2 text-sm w-64"
+    />
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+      Search
+    </button>
+    <a href={~p"/listings"} class="px-4 py-2 text-sm text-gray-500">Clear</a>
+  </form>
+
+  <%!-- Results --%>
+  <%= if Enum.empty?(@listings) do %>
+    <p class="text-gray-400 text-center py-16">No properties found.</p>
+  <% else %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div :for={prop <- @listings} class="border rounded-lg overflow-hidden">
+
+        <%!-- Image --%>
+        <%= if prop.image do %>
+          <img
+            src={RealEstate.Uploaders.PropertyImage.url({prop.image, prop}, :thumb)}
+            class="w-full h-40 object-cover"
+          />
+        <% else %>
+          <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
+            <p class="text-gray-400 text-sm">No image</p>
+          </div>
+        <% end %>
+
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class={[
+              "text-xs px-2 py-0.5 rounded font-medium",
+              prop.type == "sale" && "bg-blue-100 text-blue-700",
+              prop.type == "rent" && "bg-green-100 text-green-700"
+            ]}>
+              {if prop.type == "sale", do: "For Sale", else: "For Rent"}
+            </span>
+          </div>
+
+          <h3 class="font-semibold text-base mb-1">{prop.title}</h3>
+          <p class="text-gray-500 text-sm mb-1">{prop.location}</p>
+          <p class="text-lg font-bold mb-3">KES {prop.price}</p>
+          <p class="text-xs text-gray-400 mb-3">
+            Listed by {prop.owner.full_name || prop.owner.email}
+          </p>
+
+          <.link
+            href={~p"/listings/#{prop.id}"}
+            class="block text-center bg-gray-100 hover:bg-gray-200 text-sm py-2 rounded">
+            View Details
+          </.link>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

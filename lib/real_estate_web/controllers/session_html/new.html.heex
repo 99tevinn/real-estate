@@ -1,0 +1,15 @@
+<%!-- session_html/new.html.heex --%>
+<div class="mx-auto max-w-sm mt-16">
+  <h1 class="text-2xl font-semibold mb-6">Sign in</h1>
+
+  <.form :let={f} for={%{}} as={:session} action={~p"/login"} method="post">
+    <.input field={f[:email]} type="email" label="Email" required />
+    <.input field={f[:password]} type="password" label="Password" required />
+    <.button type="submit" class="w-full mt-4">Sign in</.button>
+  </.form>
+
+  <p class="mt-4 text-sm text-center">
+    Don't have an account?
+    <.link href={~p"/register"}>Register</.link>
+  </p>
+</div>

@@ -1,0 +1,37 @@
+<div class="mx-auto max-w-lg mt-10 p-6">
+  <h1 class="text-2xl font-semibold mb-6">User Details</h1>
+
+  <div class="border rounded p-4 text-sm space-y-3">
+    <div class="flex justify-between">
+      <span class="text-gray-500">Name</span>
+      <span><%= @user.full_name || "—" %></span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-gray-500">Email</span>
+      <span><%= @user.email %></span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-gray-500">Role</span>
+      <span class="capitalize"><%= @user.role %></span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-gray-500">Status</span>
+      <span class={if @user.active, do: "text-green-600", else: "text-red-600"}>
+        <%= if @user.active, do: "Active", else: "Inactive" %>
+      </span>
+    </div>
+    <div class="flex justify-between">
+      <span class="text-gray-500">Joined</span>
+      <span><%= Calendar.strftime(@user.inserted_at, "%d %b %Y") %></span>
+    </div>
+  </div>
+
+  <div class="flex gap-4 mt-6">
+    <.link href={~p"/admin/users/#{@user.id}/edit"} class="text-blue-600 text-sm">
+      Edit User
+    </.link>
+    <.link href={~p"/admin/users"} class="text-gray-500 text-sm">
+      ← Back to users
+    </.link>
+  </div>
+</div>

@@ -1,0 +1,24 @@
+<%!-- lib/real_estate_web/controllers/admin/property_html/edit.html.heex --%>
+<div class="mx-auto max-w-lg mt-10 p-6">
+  <h1 class="text-2xl font-semibold mb-2">Edit Property</h1>
+  <p class="text-gray-500 mb-6"><%= @property.title %></p>
+
+  <.form :let={f} for={@changeset} action={~p"/admin/properties/#{@property.id}"} method="post">
+    <input type="hidden" name="_method" value="put" />
+
+    <.input field={f[:title]} type="text" label="Title" required />
+    <.input field={f[:description]} type="textarea" label="Description" />
+    <.input field={f[:location]} type="text" label="Location" required />
+    <.input field={f[:price]} type="number" label="Price (KES)" required />
+    <.input field={f[:type]} type="select" label="Listing Type"
+      options={[{"For Sale", "sale"}, {"For Rent", "rent"}]} />
+    <.input field={f[:status]} type="select" label="Status"
+      options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]} />
+
+    <.button type="submit" class="w-full mt-4">Save Changes</.button>
+  </.form>
+
+  <.link href={~p"/admin/properties"} class="mt-4 inline-block text-sm text-gray-500">
+    ← Back to properties
+  </.link>
+</div>

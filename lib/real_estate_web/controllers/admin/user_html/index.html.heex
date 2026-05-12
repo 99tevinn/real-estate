@@ -1,0 +1,50 @@
+<div class="p-6">
+  <h1 class="text-2xl font-semibold mb-6">User Management</h1>
+
+  <table class="w-full text-sm border">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="p-2 text-left">Name</th>
+        <th class="p-2 text-left">Email</th>
+        <th class="p-2 text-left">Role</th>
+        <th class="p-2 text-left">Status</th>
+        <th class="p-2 text-left">Joined</th>
+        <th class="p-2 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr :for={user <- @users} class="border-t">
+        <td class="p-2"><%= user.full_name || "—" %></td>
+        <td class="p-2"><%= user.email %></td>
+        <td class="p-2 capitalize"><%= user.role %></td>
+        <td class="p-2">
+          <span class={[
+            "text-xs px-2 py-0.5 rounded",
+            user.active && "bg-green-100 text-green-700",
+            !user.active && "bg-red-100 text-red-600"
+          ]}>
+            <%= if user.active, do: "Active", else: "Inactive" %>
+          </span>
+        </td>
+        <td class="p-2"><%= Calendar.strftime(user.inserted_at, "%d %b %Y") %></td>
+        <td class="p-2 flex gap-3">
+          <.link href={~p"/admin/users/#{user.id}"} class="text-gray-600">
+            View
+          </.link>
+          <.link href={~p"/admin/users/#{user.id}/edit"} class="text-blue-600">
+            Edit
+          </.link>
+          <%= if user.active do %>
+            <.link
+              href={~p"/admin/users/#{user.id}"}
+              method="delete"
+              data-confirm="Deactivate this user?"
+              class="text-red-600">
+              Deactivate
+            </.link>
+          <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
