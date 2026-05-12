@@ -3,7 +3,13 @@ defmodule RealEstate.Mailer.Notifier do
   import Swoosh.Email
   alias RealEstate.Mailer
 
-  def send_enquiry_notification(recipient_email, recipient_name, buyer_name, property_title, message) do
+  def send_enquiry_notification(
+        recipient_email,
+        recipient_name,
+        buyer_name,
+        property_title,
+        message
+      ) do
     new()
     |> to({recipient_name, recipient_email})
     |> from({"RealEstate App", "noreply@realestate.com"})
@@ -27,6 +33,34 @@ defmodule RealEstate.Mailer.Notifier do
       Message: #{message}
 
       Log in to respond.
+    """)
+    |> Mailer.deliver()
+  end
+
+  # lib/real_estate/mailer/notifier.ex — add this function
+  def send_password_reset(email, reset_url) do
+    new()
+    |> to(email)
+    |> from({"RealEstate App", "noreply@realestate.com"})
+    |> subject("Reset Your Password")
+    |> html_body("""
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h3>Password Reset Request</h3>
+        <p>Click the link below to reset your password. This link expires in 2 hours.</p>
+        <a href="#{reset_url}"
+          style="background: #2563eb; color: white; padding: 12px 24px;
+                 border-radius: 6px; text-decoration: none; display: inline-block;">
+          Reset Password
+        </a>
+        <p style="margin-top: 16px; color: #666; font-size: 14px;">
+          If you did not request this, ignore this email.
+        </p>
+      </div>
+    """)
+    |> text_body("""
+      Reset your password by visiting: #{reset_url}
+      This link expires in 2 hours.
+      If you did not request this, ignore this email.
     """)
     |> Mailer.deliver()
   end

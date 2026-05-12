@@ -1,6 +1,25 @@
 <div class="p-6">
   <h1 class="text-2xl font-semibold mb-6">All Properties</h1>
 
+  <%!-- --- ADD THE FILTER FORM HERE --- --%>
+  <div class="bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200">
+    <.form :let={f} for={%{}} method="get" action={~p"/admin/properties"} class="flex flex-wrap gap-4 items-end">
+      <div class="w-48">
+        <.input field={f[:min_price]} type="number" label="Min Price (KES)" value={@params["min_price"]} placeholder="Min" />
+      </div>
+      <div class="w-48">
+        <.input field={f[:max_price]} type="number" label="Max Price (KES)" value={@params["max_price"]} placeholder="Max" />
+      </div>
+      <div class="flex gap-2">
+        <.button class="bg-blue-600 hover:bg-blue-700">Filter Results</.button>
+        <.link href={~p"/admin/properties"} class="py-2 px-3 text-sm text-gray-500 border rounded hover:bg-gray-100">
+          Reset
+        </.link>
+      </div>
+    </.form>
+  </div>
+
+  <%!-- Your existing table starts here --%>
   <table class="w-full text-sm border">
     <thead>
       <tr class="bg-gray-100">
@@ -20,16 +39,8 @@
         <td class="p-2"><%= prop.price %></td>
         <td class="p-2 capitalize"><%= prop.status %></td>
         <td class="p-2 flex gap-3">
-          <.link href={~p"/admin/properties/#{prop.id}/edit"} class="text-blue-600">
-            Edit
-          </.link>
-          <.link
-            href={~p"/admin/properties/#{prop.id}"}
-            method="delete"
-            data-confirm="Permanently delete this property?"
-            class="text-red-600">
-            Delete
-          </.link>
+          <.link href={~p"/admin/properties/#{prop.id}/edit"} class="text-blue-600">Edit</.link>
+          <.link href={~p"/admin/properties/#{prop.id}"} method="delete" data-confirm="Delete?" class="text-red-600">Delete</.link>
         </td>
       </tr>
     </tbody>

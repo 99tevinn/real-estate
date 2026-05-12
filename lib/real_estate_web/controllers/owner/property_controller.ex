@@ -3,10 +3,16 @@ defmodule RealEstateWeb.Owner.PropertyController do
   alias RealEstate.Properties
   alias RealEstate.Properties.Property
 
-  def index(conn, _params) do
+  def index(conn, params) do
     owner_id = conn.assigns.current_user.id
-    properties = Properties.list_owner_properties(owner_id)
-    render(conn, :index, properties: properties)
+    page = String.to_integer(params["page"] || "1")
+    properties = Properties.list_owner_properties(owner_id, page)
+
+    render(conn, :index,
+      properties: properties.entries,
+      page_number: properties.page_number,
+      total_pages: properties.total_pages
+    )
   end
 
   def new(conn, _params) do

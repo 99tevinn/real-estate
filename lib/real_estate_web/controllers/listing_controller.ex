@@ -4,9 +4,14 @@ defmodule RealEstateWeb.ListingController do
   alias RealEstate.Properties
 
   def index(conn, params) do
-    filters  = Map.take(params, ["type", "location"])
-    listings = Properties.list_public_listings(filters)
-    render(conn, :index, listings: listings, filters: filters)
+    listings = Properties.search_properties(params)
+
+    render(conn, :index,
+      listings: listings.entries,
+      filters: params,
+      page_number: listings.page_number,
+      total_pages: listings.total_pages
+    )
   end
 
   def show(conn, %{"id" => id}) do

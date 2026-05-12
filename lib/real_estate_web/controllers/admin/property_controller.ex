@@ -2,14 +2,20 @@
 defmodule RealEstateWeb.Admin.PropertyController do
   use RealEstateWeb, :controller
   alias RealEstate.Properties
-  
-  def index(conn, _params) do
-    properties = Properties.list_all_properties()
-    render(conn, :index, properties: properties)
+
+  def index(conn, params) do
+    properties = Properties.search_properties(params)
+
+    render(conn, :index,
+      properties: properties.entries,
+      page_number: properties.page_number,
+      total_pages: properties.total_pages,
+      params: params
+    )
   end
 
   def edit(conn, %{"id" => id}) do
-    property  = Properties.get_property!(id)
+    property = Properties.get_property!(id)
     changeset = Properties.change_property(property)
     render(conn, :edit, property: property, changeset: changeset)
   end

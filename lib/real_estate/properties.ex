@@ -6,18 +6,18 @@ defmodule RealEstate.Properties do
 
   # ── Queries ──────────────────────────────────────────
 
-  def list_owner_properties(owner_id) do
+  def list_owner_properties(owner_id, page \\ 1) do
     Property
     |> where([p], p.owner_id == ^owner_id)
     |> order_by([p], desc: p.inserted_at)
-    |> Repo.all()
+    |> Repo.paginate(page: page)
   end
 
-  def list_all_properties do
+  def list_all_properties(page \\ 1) do
     Property
     |> order_by([p], desc: p.inserted_at)
     |> preload(:owner)
-    |> Repo.all()
+    |> Repo.paginate(page: page)
   end
 
   def list_available_properties do
@@ -27,11 +27,11 @@ defmodule RealEstate.Properties do
     |> Repo.all()
   end
 
-  def list_agent_listings(agent_id) do
+  def list_agent_listings(agent_id, page \\ 1) do
     Property
     |> where([p], p.agent_id == ^agent_id)
     |> order_by([p], desc: p.inserted_at)
-    |> Repo.all()
+    |> Repo.paginate(page: page)
   end
 
   def get_property!(id) do
@@ -125,11 +125,11 @@ defmodule RealEstate.Properties do
     |> Repo.all()
   end
 
-  def list_all_enquiries do
+  def list_all_enquiries(page \\ 1) do
     Enquiry
     |> order_by([e], desc: e.inserted_at)
     |> preload([:property, :buyer])
-    |> Repo.all()
+    |> Repo.paginate(page: page)
   end
 
   def get_enquiry!(id) do
@@ -203,14 +203,14 @@ defmodule RealEstate.Properties do
     |> Repo.update()
   end
 
-  def list_public_listings(filters \\ %{}) do
+  def list_public_listings(filters \\ %{}, page \\ 1) do
     Property
     |> where([p], p.status == "available")
     |> filter_by_type(filters["type"])
     |> filter_by_location(filters["location"])
     |> order_by([p], desc: p.inserted_at)
     |> preload(:owner)
-    |> Repo.all()
+    |> Repo.paginate(page: page)
   end
 
   def get_agent_listing!(agent_id, id) do
@@ -244,6 +244,37 @@ defmodule RealEstate.Properties do
     end
   end
 
+  def search_properties(params) do
+    %Property{}
+    |> Repo.preload(:owner)
+    |> where_min_price(params["min_price"])
+    |> where_max_price(params["max_price"])
+    |> filter_by_type(params["type"])
+    |> filter_by_location(params["location"])
+    |> order_by([p], desc: p.inserted_at)
+    |> Repo.paginate(params)
+  end
+
+  def get_property_stats(params) do
+    base_query =
+      Property
+      |> where_min_price(params["min_price"])
+      |> where_max_price(params["max_price"])
+      |> filter_by_location(params["location"])
+
+    %{
+      total_count: Repo.aggregate(base_query, :count, :id),
+      total_value: Repo.aggregate(base_query, :sum, :price) || 0,
+      avg_price: Repo.aggregate(base_query, :avg, :price) || 0
+    }
+  end
+
+  defp where_min_price(query, nil), do: query
+  defp where_min_price(query, price), do: from(p in query, where: p.price >= ^price)
+
+  defp where_max_price(query, nil), do: query
+  defp where_max_price(query, price), do: from(p in query, where: p.price <= ^price)
+
   def saved?(buyer_id, property_id) do
     SavedListing
     |> where([s], s.buyer_id == ^buyer_id and s.property_id == ^property_id)
@@ -258,6 +289,10 @@ defmodule RealEstate.Properties do
   defp filter_by_location(query, ""), do: query
 
   defp filter_by_location(query, location) do
+  if location != "" and !is_nil(location) do
     where(query, [p], ilike(p.location, ^"%#{location}%"))
+  else
+    query
   end
+end
 end

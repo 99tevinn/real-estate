@@ -41,6 +41,10 @@ defmodule RealEstateWeb.Router do
     post "/register", RegistrationController, :create
     get "/listings", ListingController, :index
     get "/listings/:id", ListingController, :show
+    get "/forgot-password", PasswordResetController, :new
+    post "/forgot-password", PasswordResetController, :create
+    get "/password_reset/:token", PasswordResetController, :edit
+    put "/password_reset/:token", PasswordResetController, :update
   end
 
   live_session :admin, on_mount: {RealEstateWeb.LiveAuth, :require_admin} do

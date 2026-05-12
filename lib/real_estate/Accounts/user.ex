@@ -11,6 +11,8 @@ defmodule RealEstate.Accounts.User do
     field :role, :string, default: "buyer"
     field :full_name, :string
     field :active, :boolean, default: true
+    field :reset_password_token, :string
+    field :reset_password_sent_at, :utc_datetime
 
     has_many :properties, RealEstate.Properties.Property, foreign_key: :agent_id
     has_many :enquiries_made, RealEstate.Properties.Enquiry, foreign_key: :buyer_id
@@ -36,10 +38,18 @@ defmodule RealEstate.Accounts.User do
     |> validate_inclusion(:role, @roles)
   end
 
+  def password_reset_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:password])
+    |> validate_required([:password])
+    |> validate_length(:password, min: 8)
+    |> hash_password()
+  end
+
   defp hash_password(%Ecto.Changeset{valid?: true, changes: %{password: pw}} = cs) do
     case pw do
       "" -> add_error(cs, :password, "can't be blank")
-      _  -> put_change(cs, :password_hash, Bcrypt.hash_pwd_salt(pw))
+      _ -> put_change(cs, :password_hash, Bcrypt.hash_pwd_salt(pw))
     end
   end
 

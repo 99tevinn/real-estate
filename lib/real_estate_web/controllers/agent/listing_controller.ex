@@ -3,10 +3,16 @@ defmodule RealEstateWeb.Agent.ListingController do
   alias RealEstate.Properties
   alias RealEstate.Properties.Property
 
-  def index(conn, _params) do
+  def index(conn, params) do
     agent_id = conn.assigns.current_user.id
-    listings = Properties.list_agent_listings(agent_id)
-    render(conn, :index, listings: listings)
+    page = String.to_integer(params["page"] || "1")
+    listings = Properties.list_agent_listings(agent_id, page)
+
+    render(conn, :index,
+      listings: listings.entries,
+      page_number: listings.page_number,
+      total_pages: listings.total_pages
+    )
   end
 
   def new(conn, _params) do
