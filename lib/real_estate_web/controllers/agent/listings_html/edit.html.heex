@@ -1,23 +1,70 @@
-<%!-- lib/real_estate_web/controllers/agent/listing_html/edit.html.heex --%>
-<div class="mx-auto max-w-lg mt-10 p-6">
-  <h1 class="text-2xl font-semibold mb-2">Edit Listing</h1>
-  <p class="text-gray-500 mb-6"><%= @listing.title %></p>
+<div class="max-w-3xl p-6 mx-auto">
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-xs text-blue-600 font-bold uppercase tracking-widest mb-2">
+      <.link href={~p"/agent/listings"} class="hover:underline text-gray-400">My Listings</.link>
+      <span class="text-gray-300">/</span>
+      <span>Edit Property</span>
+    </div>
+    
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Listing</h1>
+        <p class="text-gray-500 text-sm mt-1 italic">{@listing.title}</p>
+      </div>
+      
+      <div class={[
+        "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border self-start md:self-center",
+        @listing.status == "available" && "bg-green-50 text-green-700 border-green-100",
+        @listing.status == "sold" && "bg-gray-50 text-gray-600 border-gray-100",
+        @listing.status == "rented" && "bg-blue-50 text-blue-700 border-blue-100"
+      ]}>
+        Current: {@listing.status}
+      </div>
+    </div>
+  </div>
 
-  <.form :let={f} for={@changeset} action={~p"/agent/listings/#{@listing.id}"} method="post">
-    <input type="hidden" name="_method" value="put" />
-    <.input field={f[:title]}       type="text"     label="Title"        required />
-    <.input field={f[:description]} type="textarea" label="Description" />
-    <.input field={f[:location]}    type="text"     label="Location"     required />
-    <.input field={f[:price]}       type="number"   label="Price (KES)"  required />
-    <.input field={f[:type]}        type="select"   label="Listing Type"
-      options={[{"For Sale", "sale"}, {"For Rent", "rent"}]} />
-    <.input field={f[:status]}      type="select"   label="Status"
-      options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]} />
+  <div class="bg-white rounded-2xl border shadow-sm p-8 relative overflow-hidden">
+    <%!-- Visual indicator that this is an edit session --%>
+    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
 
-    <.button type="submit" class="w-full mt-4">Save Changes</.button>
-  </.form>
+    <.form :let={f} for={@changeset} action={~p"/agent/listings/#{@listing.id}"} method="post" class="space-y-6">
+      <input type="hidden" name="_method" value="put" />
+      
+      <div class="grid grid-cols-1 gap-6">
+        <.input field={f[:title]} type="text" label="Listing Title" required />
+        <.input field={f[:description]} type="textarea" label="Property Description" rows="5" />
+      </div>
 
-  <.link href={~p"/agent/listings"} class="mt-4 inline-block text-sm text-gray-500">
-    ← Back to listings
-  </.link>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <.input field={f[:location]} type="text" label="Location" required />
+        <.input field={f[:price]} type="number" label="Price (KES)" required />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-50">
+        <.input field={f[:type]} type="select" label="Listing Category"
+          options={[{"For Sale", "sale"}, {"For Rent", "rent"}]} />
+          
+        <.input field={f[:status]} type="select" label="Update Status"
+          options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]} />
+      </div>
+
+      <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-8 mt-4">
+        <.link href={~p"/agent/listings"} class="text-sm font-bold text-gray-400 hover:text-gray-600 px-4 py-2">
+          Cancel
+        </.link>
+        
+        <.button type="submit" 
+          class="bg-gray-900 text-white px-10 py-3 rounded-xl font-bold hover:bg-gray-800 shadow-md transition-all active:scale-95">
+          Save Changes
+        </.button>
+      </div>
+    </.form>
+  </div>
+
+  <%!-- Admin Audit Note --%>
+  <div class="mt-8 flex justify-center">
+    <div class="text-[10px] text-gray-400 uppercase tracking-widest font-medium bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
+      Last updated: {Calendar.strftime(@listing.updated_at, "%d %b %Y at %H:%M")}
+    </div>
+  </div>
 </div>

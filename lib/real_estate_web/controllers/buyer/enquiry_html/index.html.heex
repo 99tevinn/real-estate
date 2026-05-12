@@ -1,23 +1,40 @@
-<div class="p-6">
-  <h1 class="text-2xl font-semibold mb-6">My Enquiries</h1>
+<div>
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">My Enquiries</h1>
+    <p class="text-gray-500 text-sm mt-1">Track the status of your enquiries</p>
+  </div>
 
-  <ul class="space-y-3">
-    <li :for={enq <- @enquiries} class="border rounded p-4 text-sm">
-      <div class="flex items-center justify-between mb-1">
-        <p class="font-medium"><%= enq.property.title %></p>
-        <span class={[
-          "text-xs px-2 py-0.5 rounded",
-          enq.status == "pending" && "bg-yellow-100 text-yellow-700",
-          enq.status == "replied" && "bg-green-100 text-green-700",
-          enq.status == "closed"  && "bg-gray-100 text-gray-500"
-        ]}>
-          <%= enq.status %>
-        </span>
+  <%= if Enum.empty?(@enquiries) do %>
+    <div class="text-center py-16 bg-white rounded-xl border">
+      <p class="text-4xl mb-4">📩</p>
+      <p class="text-gray-500 mb-4">No enquiries yet.</p>
+      <.link href={~p"/listings"}
+        class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">
+        Browse listings
+      </.link>
+    </div>
+  <% else %>
+    <div class="space-y-4">
+      <div :for={enq <- @enquiries}
+        class="bg-white rounded-xl border shadow-sm p-6 hover:shadow-md transition">
+        <div class="flex items-start justify-between mb-3">
+          <div>
+            <p class="font-bold text-gray-900"><%= enq.property.title %></p>
+            <p class="text-xs text-gray-400 mt-0.5">
+              <%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %>
+            </p>
+          </div>
+          <span class={[
+            "text-xs px-2 py-1 rounded-full font-medium",
+            enq.status == "pending" && "bg-yellow-100 text-yellow-700",
+            enq.status == "replied" && "bg-green-100 text-green-700",
+            enq.status == "closed"  && "bg-gray-100 text-gray-500"
+          ]}>
+            <%= enq.status %>
+          </span>
+        </div>
+        <p class="text-sm text-gray-600 leading-relaxed"><%= enq.message %></p>
       </div>
-      <p class="text-gray-500"><%= enq.message %></p>
-      <p class="text-xs text-gray-400 mt-1">
-        Sent <%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %>
-      </p>
-    </li>
-  </ul>
+    </div>
+  <% end %>
 </div>

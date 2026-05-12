@@ -1,35 +1,89 @@
 <div class="p-6">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">My Properties</h1>
-    <.link href={~p"/owner/properties/new"} class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
-      + Add Property
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">My Properties</h1>
+      <p class="text-gray-500 text-sm mt-1">Manage, edit, and track the status of your listed properties</p>
+    </div>
+    <.link href={~p"/owner/properties/new"}
+      class="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold
+             hover:bg-gray-700 transition-all shadow-sm flex items-center gap-2">
+      <span class="text-lg">+</span> Add New Property
     </.link>
   </div>
 
-  <table class="w-full text-sm border">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="p-2 text-left">Title</th>
-        <th class="p-2 text-left">Location</th>
-        <th class="p-2 text-left">Price (KES)</th>
-        <th class="p-2 text-left">Type</th>
-        <th class="p-2 text-left">Status</th>
-        <th class="p-2 text-left">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr :for={prop <- @properties} class="border-t">
-        <td class="p-2"><%= prop.title %></td>
-        <td class="p-2"><%= prop.location %></td>
-        <td class="p-2"><%= prop.price %></td>
-        <td class="p-2 capitalize"><%= prop.type %></td>
-        <td class="p-2 capitalize"><%= prop.status %></td>
-        <td class="p-2">
-          <.link href={~p"/owner/properties/#{prop.id}/edit"} class="text-blue-600">
-            Edit
-          </.link>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <%= if Enum.empty?(@properties) do %>
+    <div class="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+      <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-4xl">🏠</span>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900">No properties yet</h3>
+      <p class="text-gray-500 mb-8 max-w-xs mx-auto">Start by listing your first property to begin receiving enquiries.</p>
+      <.link href={~p"/owner/properties/new"}
+        class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all">
+        List your first property
+      </.link>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-widest border-b">
+              <th class="px-6 py-4 font-bold">Property Details</th>
+              <th class="px-6 py-4 font-bold text-center">Type</th>
+              <th class="px-6 py-4 font-bold text-center">Status</th>
+              <th class="px-6 py-4 font-bold text-right">Price</th>
+              <th class="px-6 py-4 font-bold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr :for={prop <- @properties} class="hover:bg-gray-50/50 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{prop.title}</div>
+                <div class="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                  <span class="opacity-60">📍</span>{prop.location}
+                </div>
+              </td>
+              
+              <td class="px-6 py-4 text-center">
+                <span class="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-tighter">
+                  {prop.type}
+                </span>
+              </td>
+              
+              <td class="px-6 py-4 text-center">
+                <span class={[
+                  "text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-tight",
+                  prop.status == "available" && "bg-green-100 text-green-700",
+                  prop.status == "sold"      && "bg-gray-100 text-gray-600",
+                  prop.status == "rented"    && "bg-blue-100 text-blue-700"
+                ]}>
+                  {prop.status}
+                </span>
+              </td>
+              
+              <td class="px-6 py-4 text-right">
+                <div class="text-gray-900 font-extrabold">
+                  <span class="text-[10px] font-normal text-gray-400 mr-1">KES</span>{prop.price}
+                </div>
+              </td>
+              
+              <td class="px-6 py-4 text-right">
+                <div class="flex justify-end gap-3">
+                  <.link href={~p"/owner/properties/#{prop.id}/edit"}
+                    class="text-blue-600 hover:text-blue-800 text-xs font-bold bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
+                    Edit
+                  </.link>
+                  <.link href={~p"/owner/properties/#{prop.id}"}
+                    class="text-gray-600 hover:text-gray-900 text-xs font-bold bg-gray-100 px-3 py-1.5 rounded-lg transition-colors">
+                    View
+                  </.link>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
 </div>

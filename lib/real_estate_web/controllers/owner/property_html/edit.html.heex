@@ -1,57 +1,81 @@
-<%!-- owner/property_html/edit.html.heex --%>
-<div class="mx-auto max-w-lg mt-10 p-6">
-  <h1 class="text-2xl font-semibold mb-2">Edit Property</h1>
-  
-  <p class="text-gray-500 mb-6">{@property.title}</p>
-   <%!-- Show existing image --%>
-  <%= if @property.image do %>
-    <div class="mb-4">
-      <p class="text-sm text-gray-500 mb-2">Current Image</p>
-      
-      <img
-        src={RealEstate.Uploaders.PropertyImage.url({@property.image, @property}, :thumb)}
-        class="w-full h-48 object-cover rounded"
-      />
+<div class="max-w-2xl p-6">
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-sm text-blue-600 font-semibold mb-2">
+      <.link href={~p"/owner/properties"} class="hover:underline">Properties</.link>
+      <span>/</span>
+      <span class="text-gray-400">Edit Listing</span>
     </div>
-  <% end %>
-  
-  <.form
-    :let={f}
-    for={@changeset}
-    action={~p"/owner/properties/#{@property.id}"}
-    method="post"
-    multipart={true}
-  >
-    <input type="hidden" name="_method" value="put" />
-    <.input field={f[:title]} type="text" label="Title" required />
-    <.input field={f[:description]} type="textarea" label="Description" />
-    <.input field={f[:location]} type="text" label="Location" required />
-    <.input field={f[:price]} type="number" label="Price (KES)" required />
-    <.input
-      field={f[:type]}
-      type="select"
-      label="Listing Type"
-      options={[{"For Sale", "sale"}, {"For Rent", "rent"}]}
-    />
-    <.input
-      field={f[:status]}
-      type="select"
-      label="Status"
-      options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]}
-    />
-    <div class="mb-4">
-      <label class="block text-sm font-medium mb-1">Replace Image (optional)</label>
-      <input
-        type="file"
-        name="property[image]"
-        accept=".jpg,.jpeg,.png,.webp"
-        class="w-full text-sm"
-      />
-    </div>
-     <.button type="submit" class="w-full mt-4">Update Property</.button>
-  </.form>
-  
-  <.link href={~p"/owner/properties"} class="mt-4 inline-block text-sm text-gray-500">
-    ← Back to my properties
-  </.link>
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Property</h1>
+    <p class="text-gray-500 text-sm mt-1 italic">Editing: {@property.title}</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border shadow-sm p-8">
+    <%!-- Current Image Preview --%>
+    <%= if @property.image do %>
+      <div class="mb-10 pb-8 border-b border-gray-100">
+        <label class="block text-sm font-bold text-gray-700 mb-3">Current Featured Image</label>
+        <div class="relative group max-w-md">
+          <img
+            src={RealEstate.Uploaders.PropertyImage.url({@property.image, @property}, :thumb)}
+            class="w-full h-56 object-cover rounded-xl shadow-md border border-gray-200"
+          />
+          <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+            <span class="text-white text-xs font-bold bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">Current Photo</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <.form :let={f} for={@changeset} action={~p"/owner/properties/#{@property.id}"} method="post" multipart={true} class="space-y-6">
+      <%!-- Phoenix uses this hidden input to turn a POST into a PUT/PATCH --%>
+      <input type="hidden" name="_method" value="put" />
+
+      <div class="grid grid-cols-1 gap-6">
+        <.input field={f[:title]} type="text" label="Property Title" required />
+        <.input field={f[:description]} type="textarea" label="Description" rows="4" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <.input field={f[:location]} type="text" label="Location" required />
+        <.input field={f[:price]} type="number" label="Price (KES)" required />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+        <.input field={f[:type]} type="select" label="Listing Type"
+          options={[{"For Sale", "sale"}, {"For Rent", "rent"}]} />
+          
+        <.input field={f[:status]} type="select" label="Status"
+          options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]} />
+      </div>
+
+      <%!-- Styled File Upload for Replacement --%>
+      <div class="pt-4">
+        <label class="block text-sm font-bold text-gray-700 mb-2">Replace Image <span class="font-normal text-gray-400">(optional)</span></label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-blue-400 transition-colors bg-gray-50/50">
+          <div class="space-y-1 text-center">
+            <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="flex text-sm text-gray-600">
+              <label for="file-upload" class="relative cursor-pointer rounded-md font-bold text-blue-600 hover:text-blue-500">
+                <span>Upload a new photo</span>
+                <input id="file-upload" name="property[image]" type="file" class="sr-only" accept=".jpg,.jpeg,.png,.webp" />
+              </label>
+            </div>
+            <p class="text-[10px] text-gray-400 uppercase tracking-tight">Leave blank to keep current image</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-8">
+        <.link href={~p"/owner/properties"} class="text-sm font-bold text-gray-500 hover:text-gray-700">
+          Cancel
+        </.link>
+        
+        <.button type="submit" class="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 shadow-md transition-all active:scale-95">
+          Update Listing
+        </.button>
+      </div>
+    </.form>
+  </div>
 </div>

@@ -1,28 +1,61 @@
-<%!-- lib/real_estate_web/controllers/password_reset_html/edit.html.heex --%>
-<div class="mx-auto max-w-sm mt-16 p-6">
-  <h1 class="text-2xl font-semibold mb-2">Reset Password</h1>
-  
-  <p class="text-gray-500 mb-6 text-sm">Enter your new password below.</p>
-  
-  <form action={~p"/password_reset/#{@token}"} method="post">
-    <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
-    <input type="hidden" name="_method" value="put" />
-    <div class="mb-4">
-      <label class="block text-sm font-medium mb-1">New Password</label>
-      <input
-        type="password"
-        name="password"
-        required
-        minlength="8"
-        class="w-full border rounded px-3 py-2 text-sm"
-      />
+<div class="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6 py-12">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-sm border border-slate-100 mb-4">
+        <span class="text-3xl text-blue-600">🛡️</span>
+      </div>
+      
+      <h1 class="text-3xl font-black text-slate-900 tracking-tight">Set New Password</h1>
+      
+      <p class="text-slate-500 text-sm mt-2 max-w-[280px] mx-auto leading-relaxed">
+        Your recovery link was verified. Please choose a strong, unique password.
+      </p>
     </div>
     
-    <button
-      type="submit"
-      class="w-full bg-blue-600 text-white py-2 rounded text-sm font-medium"
-    >
-      Reset Password
-    </button>
-  </form>
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-10">
+      <form action={~p"/password_reset/#{@token}"} method="post" class="space-y-6">
+        <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+        <input type="hidden" name="_method" value="put" />
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+            New Password
+          </label>
+          <input
+            type="password"
+            name="password"
+            required
+            minlength="8"
+            placeholder="Min. 8 characters"
+            class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+          />
+        </div>
+        
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+            Confirm New Password
+          </label>
+          <input
+            type="password"
+            name="password_confirmation"
+            required
+            placeholder="Repeat password"
+            class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+          />
+        </div>
+        
+        <button
+          type="submit"
+          class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-black shadow-lg shadow-slate-200 transition-all active:scale-[0.98] text-sm"
+        >
+          Update Password
+        </button>
+      </form>
+    </div>
+    
+    <div class="mt-8 text-center">
+      <p class="text-xs text-slate-400 font-medium italic">
+        Need help? Contact platform security support.
+      </p>
+    </div>
+  </div>
 </div>

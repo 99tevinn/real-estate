@@ -1,27 +1,91 @@
-<div class="mx-auto max-w-lg mt-10 p-6">
-  <h1 class="text-2xl font-semibold mb-2">Enquiry Details</h1>
-  
-  <p class="text-gray-500 mb-6">{@enquiry.property.title} ·
-    From: {@enquiry.buyer.full_name || @enquiry.buyer.email}</p>
-  
-  <div class="border rounded p-4 mb-6 text-sm text-gray-700">{@enquiry.message}</div>
-  
-  <.form for={@enquiry} action={~p"/agent/enquiries/#{@enquiry.id}"} method="post">
-    <input type="hidden" name="_method" value="put" />
-    <div class="mb-4">
-      <label class="block text-sm font-medium mb-1">Update Status</label>
-      <select name="enquiry[status]" class="border rounded px-3 py-2 text-sm w-full">
-        <option value="pending" selected={@enquiry.status == "pending"}>Pending</option>
-        
-        <option value="replied" selected={@enquiry.status == "replied"}>Replied</option>
-        
-        <option value="closed" selected={@enquiry.status == "closed"}>Closed</option>
-      </select>
+<div class="max-w-3xl p-6 mx-auto">
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-xs text-blue-600 font-bold uppercase tracking-widest mb-2">
+      <.link href={~p"/agent/enquiries"} class="hover:underline text-gray-400 font-medium">Enquiries</.link>
+      <span class="text-gray-300">/</span>
+      <span>Lead Details</span>
     </div>
-     <.button type="submit" class="w-full">Update Status</.button>
-  </.form>
-  
-  <.link href={~p"/agent/enquiries"} class="mt-4 inline-block text-sm text-gray-500">
-    ← Back to enquiries
-  </.link>
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Review Enquiry</h1>
+    <p class="text-gray-500 text-sm mt-1">Manage the conversation status for this potential lead.</p>
+  </div>
+
+  <%!-- Enquiry Info Card --%>
+  <div class="bg-white rounded-2xl border shadow-sm overflow-hidden mb-6">
+    <div class="bg-gray-50 border-b px-8 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+          {String.at(@enquiry.buyer.full_name || "B", 0)}
+        </div>
+        <div>
+          <p class="text-sm font-bold text-gray-900">{@enquiry.buyer.full_name || "Anonymous Buyer"}</p>
+          <p class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">{@enquiry.buyer.email}</p>
+        </div>
+      </div>
+      <span class={[
+        "text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest border",
+        @enquiry.status == "pending" && "bg-amber-50 text-amber-700 border-amber-100",
+        @enquiry.status == "replied" && "bg-emerald-50 text-emerald-700 border-emerald-100",
+        @enquiry.status == "closed"  && "bg-gray-100 text-gray-500 border-gray-200"
+      ]}>
+        {@enquiry.status}
+      </span>
+    </div>
+
+    <div class="p-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div class="space-y-1">
+          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Inquired Property</p>
+          <p class="font-bold text-gray-900 text-lg">{@enquiry.property.title}</p>
+          <.link href={~p"/listings/#{@enquiry.property.id}"} class="text-xs text-blue-600 hover:underline inline-block">
+            View Public Listing Details →
+          </.link>
+        </div>
+        <div class="space-y-1">
+          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Date Received</p>
+          <p class="font-bold text-gray-900">{Calendar.strftime(@enquiry.inserted_at, "%d %b %Y at %H:%M")}</p>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100 relative">
+        <div class="absolute -top-3 left-6 bg-white border px-3 py-0.5 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          Original Message
+        </div>
+        <p class="text-gray-700 leading-relaxed italic">"{@enquiry.message}"</p>
+      </div>
+    </div>
+  </div>
+
+  <%!-- Status Management Card --%>
+  <div class="bg-white rounded-2xl border shadow-sm p-8">
+    <div class="flex items-center gap-2 mb-6">
+      <span class="text-xl">⚙️</span>
+      <h2 class="font-extrabold text-gray-900 tracking-tight">Update Lead Status</h2>
+    </div>
+
+    <form action={~p"/agent/enquiries/#{@enquiry.id}"} method="post" class="space-y-6">
+      <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
+      <input type="hidden" name="_method" value="put" />
+
+      <div class="space-y-2">
+        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Current Workflow Stage</label>
+        <select name="enquiry[status]"
+          class="w-full bg-gray-50 border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none">
+          <option value="pending" selected={@enquiry.status == "pending"}>⌛ Still Pending (Needs Attention)</option>
+          <option value="replied" selected={@enquiry.status == "replied"}>✅ Replied (Active Conversation)</option>
+          <option value="closed"  selected={@enquiry.status == "closed"}>📁 Closed (Transaction Finalized/No longer active)</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-4 pt-4">
+        <button type="submit"
+          class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95 text-sm">
+          Update Workflow
+        </button>
+        <.link href={~p"/agent/enquiries"}
+          class="text-sm font-bold text-gray-400 hover:text-gray-600 px-4 py-2 transition-colors">
+          Discard Changes
+        </.link>
+      </div>
+    </form>
+  </div>
 </div>

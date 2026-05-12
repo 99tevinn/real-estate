@@ -1,32 +1,86 @@
 <%!-- lib/real_estate_web/live/buyer/dashboard_live.html.heex --%>
-<div class="p-6">
-  <h1 class="text-2xl font-semibold mb-6">
-    Welcome, <%= @current_user.full_name %>!
-  </h1>
+<div>
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">
+      Welcome, <%= @current_user.full_name || @current_user.email %>!
+    </h1>
+    <p class="text-gray-500 text-sm mt-1">Browse properties and track your enquiries</p>
+  </div>
+
+  <%!-- Stat cards --%>
+  <div class="grid grid-cols-2 gap-6 mb-10">
+    <div class="bg-gray-900 text-white rounded-xl p-6">
+      <p class="text-gray-400 text-sm mb-1">Available Properties</p>
+      <p class="text-4xl font-bold"><%= length(@listings) %></p>
+    </div>
+    <div class="bg-yellow-500 text-gray-900 rounded-xl p-6">
+      <p class="text-yellow-800 text-sm mb-1">My Enquiries</p>
+      <p class="text-4xl font-bold"><%= length(@enquiries) %></p>
+    </div>
+  </div>
 
   <div class="grid grid-cols-2 gap-6">
-    <div>
-      <h2 class="text-lg font-medium mb-3">Available Properties</h2>
-      <ul class="space-y-2">
-        <li :for={prop <- @listings} class="border rounded p-3 text-sm">
-          <p class="font-medium"><%= prop.title %></p>
-          <p class="text-gray-500"><%= prop.location %> · KES <%= prop.price %></p>
-          <.link
-            href={~p"/buyer/enquiries/new?property_id=#{prop.id}"}
-            class="text-xs text-blue-600 mt-1 inline-block">
-            Enquire
-          </.link>
+    <%!-- Available properties --%>
+    <div class="bg-white rounded-xl border shadow-sm">
+      <div class="px-6 py-4 border-b flex items-center justify-between">
+        <h2 class="font-bold text-gray-900">Available Properties</h2>
+        <.link href={~p"/listings"}
+          class="text-xs text-blue-600 hover:underline">
+          Browse all →
+        </.link>
+      </div>
+      <ul class="divide-y">
+        <li :for={prop <- Enum.take(@listings, 5)} class="px-6 py-4 hover:bg-gray-50">
+          <p class="font-medium text-sm text-gray-900"><%= prop.title %></p>
+          <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+            <span>📍</span><%= prop.location %>
+          </p>
+          <div class="flex items-center justify-between mt-2">
+            <p class="text-sm font-bold">KES <%= prop.price %></p>
+            <.link
+              href={~p"/buyer/enquiries/new?property_id=#{prop.id}"}
+              class="text-xs bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition">
+              Enquire
+            </.link>
+          </div>
+        </li>
+        <li :if={Enum.empty?(@listings)}
+          class="px-6 py-8 text-center text-gray-400 text-sm">
+          No properties available
         </li>
       </ul>
     </div>
 
-    <div>
-      <h2 class="text-lg font-medium mb-3">My Enquiries</h2>
-      <ul class="space-y-2">
-        <li :for={enq <- @enquiries} class="border rounded p-3 text-sm">
-          <p class="font-medium"><%= enq.property.title %></p>
-          <p class="text-gray-500 truncate"><%= enq.message %></p>
-          <span class="text-xs text-gray-400"><%= enq.status %></span>
+    <%!-- My enquiries --%>
+    <div class="bg-white rounded-xl border shadow-sm">
+      <div class="px-6 py-4 border-b flex items-center justify-between">
+        <h2 class="font-bold text-gray-900">My Enquiries</h2>
+        <.link href={~p"/buyer/enquiries"}
+          class="text-xs text-blue-600 hover:underline">
+          View all →
+        </.link>
+      </div>
+      <ul class="divide-y">
+        <li :for={enq <- @enquiries} class="px-6 py-4 hover:bg-gray-50">
+          <p class="font-medium text-sm text-gray-900"><%= enq.property.title %></p>
+          <p class="text-xs text-gray-500 mt-0.5 truncate"><%= enq.message %></p>
+          <div class="flex items-center justify-between mt-2">
+            <p class="text-xs text-gray-400">
+              <%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %>
+            </p>
+            <span class={[
+              "text-xs px-2 py-0.5 rounded-full font-medium",
+              enq.status == "pending" && "bg-yellow-100 text-yellow-700",
+              enq.status == "replied" && "bg-green-100 text-green-700",
+              enq.status == "closed"  && "bg-gray-100 text-gray-500"
+            ]}>
+              <%= enq.status %>
+            </span>
+          </div>
+        </li>
+        <li :if={Enum.empty?(@enquiries)}
+          class="px-6 py-8 text-center text-gray-400 text-sm">
+          No enquiries yet
         </li>
       </ul>
     </div>

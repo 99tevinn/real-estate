@@ -1,10 +1,13 @@
+<%!-- lib/real_estate_web/components/layouts/root.html.heex --%>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="RealEstate" suffix=" · Phoenix Framework" phx-no-format>{assigns[:page_title]}</.live_title>
+    <.live_title default="RealEstate" suffix=" · Kenya" phx-no-format>
+      {assigns[:page_title]}
+    </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
@@ -23,18 +26,175 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
   </head>
-  <body>
-  <%= if assigns[:current_user] do %>
-    <span class="text-sm"><%= @current_user.email %> · <%= @current_user.role %></span>
-    <.link href={~p"/logout"} method="delete">Log out</.link>
-  <% else %>
-    <.link href={~p"/login"}>Sign in</.link>
-  <% end %>
-    {@inner_content}
+  <body class="bg-gray-50 text-gray-900 min-h-screen">
+
+    <%= if assigns[:current_user] do %>
+      <%!-- Authenticated layout with dark sidebar --%>
+      <div class="flex min-h-screen">
+
+        <%!-- Sidebar --%>
+        <aside class="w-64 bg-gray-900 text-white flex flex-col fixed inset-y-0 left-0 z-50">
+          <%!-- Logo --%>
+          <div class="px-6 py-5 border-b border-gray-700">
+            <.link href={~p"/"} class="flex items-center gap-2">
+              <span class="text-2xl">🏠</span>
+              <span class="text-lg font-bold text-white">RealEstate</span>
+            </.link>
+          </div>
+
+          <%!-- User info --%>
+          <div class="px-6 py-4 border-b border-gray-700">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Logged in as</p>
+            <p class="text-sm font-medium text-white truncate">
+              <%= @current_user.full_name || @current_user.email %>
+            </p>
+            <span class={[
+              "text-xs px-2 py-0.5 rounded-full mt-1 inline-block font-medium",
+              @current_user.role == "admin" && "bg-red-500 text-white",
+              @current_user.role == "agent" && "bg-blue-500 text-white",
+              @current_user.role == "owner" && "bg-green-500 text-white",
+              @current_user.role == "buyer" && "bg-yellow-500 text-gray-900"
+            ]}>
+              <%= @current_user.role %>
+            </span>
+          </div>
+
+          <%!-- Navigation --%>
+          <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <%= if @current_user.role == "admin" do %>
+              <.sidebar_link href={~p"/admin"} icon="📊" label="Dashboard" />
+              <.sidebar_link href={~p"/admin/users"} icon="👥" label="Users" />
+              <.sidebar_link href={~p"/admin/properties"} icon="🏘️" label="Properties" />
+              <.sidebar_link href={~p"/admin/enquiries"} icon="📩" label="Enquiries" />
+            <% end %>
+
+            <%= if @current_user.role == "agent" do %>
+              <.sidebar_link href={~p"/agent"} icon="📊" label="Dashboard" />
+              <.sidebar_link href={~p"/agent/listings"} icon="🏘️" label="My Listings" />
+              <.sidebar_link href={~p"/agent/enquiries"} icon="📩" label="Enquiries" />
+            <% end %>
+
+            <%= if @current_user.role == "owner" do %>
+              <.sidebar_link href={~p"/owner"} icon="📊" label="Dashboard" />
+              <.sidebar_link href={~p"/owner/properties"} icon="🏘️" label="My Properties" />
+              <.sidebar_link href={~p"/owner/enquiries"} icon="📩" label="Enquiries" />
+            <% end %>
+
+            <%= if @current_user.role == "buyer" do %>
+              <.sidebar_link href={~p"/buyer"} icon="📊" label="Dashboard" />
+              <.sidebar_link href={~p"/listings"} icon="🔍" label="Browse Listings" />
+              <.sidebar_link href={~p"/buyer/saved"} icon="❤️" label="Saved Properties" />
+              <.sidebar_link href={~p"/buyer/enquiries"} icon="📩" label="My Enquiries" />
+            <% end %>
+
+            <%!-- Shared --%>
+            <div class="pt-4 border-t border-gray-700 mt-4">
+              <.sidebar_link href={~p"/listings"} icon="🌐" label="Public Listings" />
+            </div>
+          </nav>
+
+          <%!-- Logout --%>
+          <div class="px-4 py-4 border-t border-gray-700">
+            <.link
+              href={~p"/logout"}
+              method="delete"
+              class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400
+                     hover:text-white hover:bg-gray-700 transition text-sm w-full">
+              <span>🚪</span>
+              <span>Log out</span>
+            </.link>
+          </div>
+        </aside>
+
+        <%!-- Main content --%>
+        <main class="flex-1 ml-64 min-h-screen">
+          <%!-- Top bar --%>
+          <div class="bg-white border-b px-8 py-4 flex items-center justify-between sticky top-0 z-40">
+            <p class="text-sm text-gray-500">
+              Welcome back, <span class="font-medium text-gray-900">
+                <%= @current_user.full_name || @current_user.email %>
+              </span>
+            </p>
+            <.link href={~p"/listings"}
+              class="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+              Browse Listings
+            </.link>
+          </div>
+
+          <%!-- Page content --%>
+          <div class="p-8">
+            {Phoenix.Flash.get(@flash, :info) &&
+              raw("""
+              """)}
+            <div :if={msg = Phoenix.Flash.get(@flash, :info)}
+              class="mb-6 bg-green-50 border border-green-200 text-green-800
+                     px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+              <span>✅</span> <%= msg %>
+            </div>
+            <div :if={msg = Phoenix.Flash.get(@flash, :error)}
+              class="mb-6 bg-red-50 border border-red-200 text-red-800
+                     px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+              <span>❌</span> <%= msg %>
+            </div>
+            {@inner_content}
+          </div>
+        </main>
+      </div>
+
+    <% else %>
+      <%!-- Public layout with top nav --%>
+      <nav class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+        <.link href={~p"/"} class="flex items-center gap-2">
+          <span class="text-xl">🏠</span>
+          <span class="font-bold text-lg">RealEstate</span>
+        </.link>
+
+        <div class="flex items-center gap-4 text-sm">
+          <.link href={~p"/listings"} class="text-gray-300 hover:text-white transition">
+            Listings
+          </.link>
+          <.link href={~p"/login"}
+            class="text-gray-300 hover:text-white transition">
+            Sign in
+          </.link>
+          <.link href={~p"/register"}
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">
+            Get Started
+          </.link>
+        </div>
+      </nav>
+
+      <%!-- Flash messages --%>
+      <div class="max-w-6xl mx-auto px-6 pt-4">
+        <div :if={msg = Phoenix.Flash.get(@flash, :info)}
+          class="mb-4 bg-green-50 border border-green-200 text-green-800
+                 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+          <span>✅</span> <%= msg %>
+        </div>
+        <div :if={msg = Phoenix.Flash.get(@flash, :error)}
+          class="mb-4 bg-red-50 border border-red-200 text-red-800
+                 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+          <span>❌</span> <%= msg %>
+        </div>
+      </div>
+
+      {@inner_content}
+
+      <%!-- Footer --%>
+      <footer class="bg-gray-900 text-gray-400 mt-16 py-10 px-6">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🏠</span>
+            <span class="font-bold text-white">RealEstate</span>
+          </div>
+          <p class="text-sm">© 2026 RealEstate Kenya. All rights reserved.</p>
+        </div>
+      </footer>
+    <% end %>
+
   </body>
 </html>

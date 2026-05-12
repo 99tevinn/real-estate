@@ -1,24 +1,49 @@
-<div class="p-6">
-  <h1 class="text-2xl font-semibold mb-6">Enquiries on My Properties</h1>
+<div>
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Enquiries</h1>
+    <p class="text-gray-500 text-sm mt-1">Enquiries received on your properties</p>
+  </div>
 
-  <ul class="space-y-3">
-    <li :for={enq <- @enquiries} class="border rounded p-4 text-sm">
-      <div class="flex items-center justify-between mb-1">
-        <p class="font-medium"><%= enq.property.title %></p>
-        <span class={[
-          "text-xs px-2 py-0.5 rounded",
-          enq.status == "pending" && "bg-yellow-100 text-yellow-700",
-          enq.status == "replied" && "bg-green-100 text-green-700",
-          enq.status == "closed"  && "bg-gray-100 text-gray-500"
-        ]}>
-          <%= enq.status %>
-        </span>
-      </div>
-      <p class="text-gray-600 mb-1"><%= enq.message %></p>
-      <p class="text-xs text-gray-400">
-        From: <%= enq.buyer.full_name || enq.buyer.email %> ·
-        <%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %>
-      </p>
-    </li>
-  </ul>
+  <%= if Enum.empty?(@enquiries) do %>
+    <div class="text-center py-16 bg-white rounded-xl border">
+      <p class="text-4xl mb-4">📩</p>
+      <p class="text-gray-500">No enquiries yet.</p>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+            <th class="px-6 py-3 text-left">Property</th>
+            <th class="px-6 py-3 text-left">From</th>
+            <th class="px-6 py-3 text-left">Message</th>
+            <th class="px-6 py-3 text-left">Status</th>
+            <th class="px-6 py-3 text-left">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr :for={enq <- @enquiries} class="border-t hover:bg-gray-50">
+            <td class="px-6 py-4 font-medium text-gray-900"><%= enq.property.title %></td>
+            <td class="px-6 py-4 text-gray-500">
+              <%= enq.buyer.full_name || enq.buyer.email %>
+            </td>
+            <td class="px-6 py-4 text-gray-500 max-w-xs truncate"><%= enq.message %></td>
+            <td class="px-6 py-4">
+              <span class={[
+                "text-xs px-2 py-1 rounded-full font-medium",
+                enq.status == "pending" && "bg-yellow-100 text-yellow-700",
+                enq.status == "replied" && "bg-green-100 text-green-700",
+                enq.status == "closed"  && "bg-gray-100 text-gray-500"
+              ]}>
+                <%= enq.status %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-gray-400 text-xs">
+              <%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
 </div>

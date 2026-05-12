@@ -1,50 +1,90 @@
 <div class="p-6">
-  <h1 class="text-2xl font-semibold mb-6">User Management</h1>
+  <div class="mb-8">
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">User Management</h1>
+    <p class="text-gray-500 text-sm mt-1">Review, edit, and control access for all registered platform members.</p>
+  </div>
 
-  <table class="w-full text-sm border">
-    <thead>
-      <tr class="bg-gray-100">
-        <th class="p-2 text-left">Name</th>
-        <th class="p-2 text-left">Email</th>
-        <th class="p-2 text-left">Role</th>
-        <th class="p-2 text-left">Status</th>
-        <th class="p-2 text-left">Joined</th>
-        <th class="p-2 text-left">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr :for={user <- @users} class="border-t">
-        <td class="p-2"><%= user.full_name || "—" %></td>
-        <td class="p-2"><%= user.email %></td>
-        <td class="p-2 capitalize"><%= user.role %></td>
-        <td class="p-2">
-          <span class={[
-            "text-xs px-2 py-0.5 rounded",
-            user.active && "bg-green-100 text-green-700",
-            !user.active && "bg-red-100 text-red-600"
-          ]}>
-            <%= if user.active, do: "Active", else: "Inactive" %>
-          </span>
-        </td>
-        <td class="p-2"><%= Calendar.strftime(user.inserted_at, "%d %b %Y") %></td>
-        <td class="p-2 flex gap-3">
-          <.link href={~p"/admin/users/#{user.id}"} class="text-gray-600">
-            View
-          </.link>
-          <.link href={~p"/admin/users/#{user.id}/edit"} class="text-blue-600">
-            Edit
-          </.link>
-          <%= if user.active do %>
-            <.link
-              href={~p"/admin/users/#{user.id}"}
-              method="delete"
-              data-confirm="Deactivate this user?"
-              class="text-red-600">
-              Deactivate
-            </.link>
-          <% end %>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead>
+          <tr class="bg-gray-50 text-gray-500 text-[10px] uppercase tracking-widest border-b">
+            <th class="px-6 py-4 font-bold">User</th>
+            <th class="px-6 py-4 font-bold">Role</th>
+            <th class="px-6 py-4 font-bold text-center">Status</th>
+            <th class="px-6 py-4 font-bold text-center">Joined</th>
+            <th class="px-6 py-4 font-bold text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr :for={user <- @users} class="hover:bg-gray-50/50 transition-colors group">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 font-bold text-xs border border-gray-200">
+                  {String.at(user.full_name || user.email, 0) |> String.upcase()}
+                </div>
+                <div>
+                  <div class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {user.full_name || "—"}
+                  </div>
+                  <div class="text-xs text-gray-500 font-medium">{user.email}</div>
+                </div>
+              </div>
+            </td>
+            
+            <td class="px-6 py-4">
+              <span class={[
+                "text-[10px] px-2.5 py-1 rounded-md font-bold uppercase tracking-tight shadow-sm",
+                user.role == "admin" && "bg-rose-50 text-rose-700 border border-rose-100",
+                user.role == "agent" && "bg-blue-50 text-blue-700 border border-blue-100",
+                user.role == "owner" && "bg-emerald-50 text-emerald-700 border border-emerald-100",
+                user.role == "buyer" && "bg-amber-50 text-amber-700 border border-amber-100"
+              ]}>
+                {user.role}
+              </span>
+            </td>
+            
+            <td class="px-6 py-4 text-center">
+              <div class="flex justify-center">
+                <span class={[
+                  "flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-tighter px-2 py-1 rounded-full",
+                  user.active && "text-emerald-600 bg-emerald-50",
+                  !user.active && "text-rose-600 bg-rose-50"
+                ]}>
+                  <span class={["w-1.5 h-1.5 rounded-full", user.active && "bg-emerald-500", !user.active && "bg-rose-500"]}></span>
+                  {if user.active, do: "Active", else: "Inactive"}
+                </span>
+              </div>
+            </td>
+            
+            <td class="px-6 py-4 text-center text-gray-400 text-xs font-medium">
+              {Calendar.strftime(user.inserted_at, "%d %b %Y")}
+            </td>
+            
+            <td class="px-6 py-4 text-right">
+              <div class="flex justify-end items-center gap-2">
+                <.link href={~p"/admin/users/#{user.id}"}
+                  class="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all" title="View Details">
+                  🔍
+                </.link>
+                <.link href={~p"/admin/users/#{user.id}/edit"}
+                  class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all" title="Edit User">
+                  ✏️
+                </.link>
+                <%= if user.active do %>
+                  <.link
+                    href={~p"/admin/users/#{user.id}"}
+                    method="delete"
+                    data-confirm={"Are you sure you want to deactivate #{user.email}?"}
+                    class="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-all" title="Deactivate">
+                    🚫
+                  </.link>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

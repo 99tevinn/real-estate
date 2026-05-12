@@ -1,48 +1,71 @@
 <%!-- lib/real_estate_web/controllers/agent/listing_html/index.html.heex --%>
-<div class="p-6">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">My Listings</h1>
+<div>
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">My Listings</h1>
+      <p class="text-gray-500 text-sm mt-1">Manage properties you represent</p>
+    </div>
     <.link href={~p"/agent/listings/new"}
-      class="bg-blue-600 text-white px-4 py-2 rounded text-sm">
+      class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium
+             hover:bg-gray-700 transition">
       + New Listing
     </.link>
   </div>
 
   <%= if Enum.empty?(@listings) do %>
-    <p class="text-gray-400 text-center py-16">No listings yet.</p>
+    <div class="text-center py-16 bg-white rounded-xl border">
+      <p class="text-4xl mb-4">🏘️</p>
+      <p class="text-gray-500 mb-4">No listings yet.</p>
+      <.link href={~p"/agent/listings/new"}
+        class="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm">
+        Create your first listing
+      </.link>
+    </div>
   <% else %>
-    <table class="w-full text-sm border">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2 text-left">Title</th>
-          <th class="p-2 text-left">Location</th>
-          <th class="p-2 text-left">Price (KES)</th>
-          <th class="p-2 text-left">Type</th>
-          <th class="p-2 text-left">Status</th>
-          <th class="p-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr :for={listing <- @listings} class="border-t">
-          <td class="p-2"><%= listing.title %></td>
-          <td class="p-2"><%= listing.location %></td>
-          <td class="p-2"><%= listing.price %></td>
-          <td class="p-2 capitalize"><%= listing.type %></td>
-          <td class="p-2 capitalize"><%= listing.status %></td>
-          <td class="p-2 flex gap-3">
-            <.link href={~p"/agent/listings/#{listing.id}/edit"} class="text-blue-600">
-              Edit
-            </.link>
-            <.link
-              href={~p"/agent/listings/#{listing.id}"}
-              method="delete"
-              data-confirm="Delete this listing?"
-              class="text-red-600">
-              Delete
-            </.link>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="bg-white rounded-xl border shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+            <th class="px-6 py-3 text-left">Title</th>
+            <th class="px-6 py-3 text-left">Location</th>
+            <th class="px-6 py-3 text-left">Price (KES)</th>
+            <th class="px-6 py-3 text-left">Type</th>
+            <th class="px-6 py-3 text-left">Status</th>
+            <th class="px-6 py-3 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr :for={listing <- @listings} class="border-t hover:bg-gray-50">
+            <td class="px-6 py-4 font-medium text-gray-900"><%= listing.title %></td>
+            <td class="px-6 py-4 text-gray-500"><%= listing.location %></td>
+            <td class="px-6 py-4 font-medium"><%= listing.price %></td>
+            <td class="px-6 py-4 capitalize text-gray-500"><%= listing.type %></td>
+            <td class="px-6 py-4">
+              <span class={[
+                "text-xs px-2 py-1 rounded-full font-medium",
+                listing.status == "available" && "bg-green-100 text-green-700",
+                listing.status == "sold"      && "bg-gray-100 text-gray-600",
+                listing.status == "rented"    && "bg-blue-100 text-blue-700"
+              ]}>
+                <%= listing.status %>
+              </span>
+            </td>
+            <td class="px-6 py-4 flex gap-3">
+              <.link href={~p"/agent/listings/#{listing.id}/edit"}
+                class="text-blue-600 hover:underline text-xs font-medium">
+                Edit
+              </.link>
+              <.link
+                href={~p"/agent/listings/#{listing.id}"}
+                method="delete"
+                data-confirm="Delete this listing?"
+                class="text-red-600 hover:underline text-xs font-medium">
+                Delete
+              </.link>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   <% end %>
 </div>

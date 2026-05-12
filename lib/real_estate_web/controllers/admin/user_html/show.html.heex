@@ -1,37 +1,100 @@
-<div class="mx-auto max-w-lg mt-10 p-6">
-  <h1 class="text-2xl font-semibold mb-6">User Details</h1>
-
-  <div class="border rounded p-4 text-sm space-y-3">
-    <div class="flex justify-between">
-      <span class="text-gray-500">Name</span>
-      <span><%= @user.full_name || "—" %></span>
+<div class="max-w-3xl p-6 mx-auto">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">
+        <.link href={~p"/admin/users"} class="hover:text-blue-600 transition-colors">User Management</.link>
+        <span>/</span>
+        <span class="text-gray-900">Profile Audit</span>
+      </div>
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">User Details</h1>
     </div>
-    <div class="flex justify-between">
-      <span class="text-gray-500">Email</span>
-      <span><%= @user.email %></span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-gray-500">Role</span>
-      <span class="capitalize"><%= @user.role %></span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-gray-500">Status</span>
-      <span class={if @user.active, do: "text-green-600", else: "text-red-600"}>
-        <%= if @user.active, do: "Active", else: "Inactive" %>
-      </span>
-    </div>
-    <div class="flex justify-between">
-      <span class="text-gray-500">Joined</span>
-      <span><%= Calendar.strftime(@user.inserted_at, "%d %b %Y") %></span>
+    
+    <div class="flex gap-2">
+      <.link href={~p"/admin/users/#{@user.id}/edit"}
+        class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95">
+        Edit Profile
+      </.link>
+      <.link href={~p"/admin/users"}
+        class="bg-white border border-gray-200 text-gray-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-all">
+        ← Back
+      </.link>
     </div>
   </div>
 
-  <div class="flex gap-4 mt-6">
-    <.link href={~p"/admin/users/#{@user.id}/edit"} class="text-blue-600 text-sm">
-      Edit User
-    </.link>
-    <.link href={~p"/admin/users"} class="text-gray-500 text-sm">
-      ← Back to users
-    </.link>
+  <div class="bg-white rounded-2xl border shadow-sm overflow-hidden mb-6">
+    <%!-- Profile Header Accent --%>
+    <div class="h-24 bg-gradient-to-r from-gray-900 to-gray-700"></div>
+    
+    <div class="px-8 pb-8">
+      <%!-- Avatar & Primary Info --%>
+      <div class="flex items-end gap-6 -mt-10 mb-8">
+        <div class="w-24 h-24 rounded-2xl bg-white p-1 shadow-lg">
+          <div class="w-full h-full rounded-xl bg-gray-100 flex items-center justify-center text-3xl font-black text-gray-400 border border-gray-200">
+            {String.at(@user.full_name || @user.email, 0) |> String.upcase()}
+          </div>
+        </div>
+        <div class="pb-2">
+          <h2 class="text-2xl font-black text-gray-900">{@user.full_name || "Name Not Provided"}</h2>
+          <p class="text-gray-500 font-medium">{@user.email}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <%!-- Role Data --%>
+        <div class="p-4 rounded-xl border border-gray-50 bg-gray-50/50">
+          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-2">Access Level</p>
+          <span class={[
+            "text-xs px-3 py-1 rounded-full font-bold uppercase tracking-tight shadow-sm border",
+            @user.role == "admin" && "bg-rose-50 text-rose-700 border-rose-100",
+            @user.role == "agent" && "bg-blue-50 text-blue-700 border-blue-100",
+            @user.role == "owner" && "bg-emerald-50 text-emerald-700 border-emerald-100",
+            @user.role == "buyer" && "bg-amber-50 text-amber-700 border-amber-100"
+          ]}>
+            {@user.role}
+          </span>
+        </div>
+
+        <%!-- Status Data --%>
+        <div class="p-4 rounded-xl border border-gray-50 bg-gray-50/50">
+          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-2">Account Status</p>
+          <span class={[
+            "inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-tight px-3 py-1 rounded-full border",
+            @user.active && "text-emerald-700 bg-emerald-50 border-emerald-100",
+            !@user.active && "text-rose-700 bg-rose-50 border-rose-100"
+          ]}>
+            <span class={["w-2 h-2 rounded-full", @user.active && "bg-emerald-500", !@user.active && "bg-rose-500"]}></span>
+            {if @user.active, do: "Active Account", else: "Deactivated"}
+          </span>
+        </div>
+
+        <%!-- Calendar Data --%>
+        <div class="p-4 rounded-xl border border-gray-50 bg-gray-50/50">
+          <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-2">Member Since</p>
+          <p class="font-bold text-gray-900">{Calendar.strftime(@user.inserted_at, "%d %b %Y")}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%!-- Account Logs / Security Placeholder --%>
+  <div class="bg-gray-900 rounded-2xl p-6 text-white shadow-xl flex items-center justify-between">
+    <div>
+      <h3 class="font-bold">Administrative Actions</h3>
+      <p class="text-gray-400 text-xs mt-1">Reviewing user permissions and security logs.</p>
+    </div>
+    <div class="flex gap-2">
+      <button class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-xs font-bold transition-all">
+        Reset Password
+      </button>
+      <%= if @user.active do %>
+        <.link
+          href={~p"/admin/users/#{@user.id}"}
+          method="delete"
+          data-confirm={"Deactivate account for #{@user.email}?"}
+          class="bg-rose-500 hover:bg-rose-600 px-4 py-2 rounded-lg text-xs font-bold transition-all">
+          Deactivate
+        </.link>
+      <% end %>
+    </div>
   </div>
 </div>

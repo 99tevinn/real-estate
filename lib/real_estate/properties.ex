@@ -245,8 +245,8 @@ defmodule RealEstate.Properties do
   end
 
   def search_properties(params) do
-    %Property{}
-    |> Repo.preload(:owner)
+    Property
+    |> preload([:owner])
     |> where_min_price(params["min_price"])
     |> where_max_price(params["max_price"])
     |> filter_by_type(params["type"])
@@ -289,10 +289,10 @@ defmodule RealEstate.Properties do
   defp filter_by_location(query, ""), do: query
 
   defp filter_by_location(query, location) do
-  if location != "" and !is_nil(location) do
-    where(query, [p], ilike(p.location, ^"%#{location}%"))
-  else
-    query
+    if location != "" and !is_nil(location) do
+      where(query, [p], ilike(p.location, ^"%#{location}%"))
+    else
+      query
+    end
   end
-end
 end

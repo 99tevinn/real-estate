@@ -1,33 +1,68 @@
-<%!-- owner/property_html/new.html.heex --%>
-<div class="mx-auto max-w-lg mt-10 p-6">
-  <h1 class="text-2xl font-semibold mb-6">List a New Property</h1>
-  
-  <.form :let={f} for={@changeset} action={~p"/owner/properties"} method="post" multipart={true}>
-    <.input field={f[:title]} type="text" label="Title" required />
-    <.input field={f[:description]} type="textarea" label="Description" />
-    <.input field={f[:location]} type="text" label="Location" required />
-    <.input field={f[:price]} type="number" label="Price (KES)" required />
-    <.input
-      field={f[:type]}
-      type="select"
-      label="Listing Type"
-      options={[{"For Sale", "sale"}, {"For Rent", "rent"}]}
-    />
-    <.input
-      field={f[:status]}
-      type="select"
-      label="Status"
-      options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]}
-    />
-    <div class="mb-4">
-      <label class="block text-sm font-medium mb-1">Property Image</label>
-      <input
-        type="file"
-        name="property[image]"
-        accept=".jpg,.jpeg,.png,.webp"
-        class="w-full text-sm"
-      />
+<%!-- lib/real_estate_web/controllers/owner/property_html/new.html.heex --%>
+<div class="max-w-2xl p-6">
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-sm text-blue-600 font-semibold mb-2">
+      <.link href={~p"/owner/properties"} class="hover:underline">Properties</.link>
+      <span>/</span>
+      <span class="text-gray-400">New Listing</span>
     </div>
-     <.button type="submit" class="w-full mt-4">List Property</.button>
-  </.form>
+    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">List a New Property</h1>
+    <p class="text-gray-500 text-sm mt-1">Provide the essential details to showcase your property to potential buyers.</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border shadow-sm p-8">
+    <.form :let={f} for={@changeset} action={~p"/owner/properties"} method="post" multipart={true} class="space-y-6">
+      
+      <div class="grid grid-cols-1 gap-6">
+        <.input field={f[:title]} type="text" label="Property Title" placeholder="e.g. Modern 3 Bedroom Apartment in Kilimani" required />
+        
+        <.input field={f[:description]} type="textarea" label="Detailed Description" placeholder="Describe the features, amenities, and unique selling points..." rows="4" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <.input field={f[:location]} type="text" label="Location" placeholder="e.g. Westlands, Nairobi" required />
+        
+        <.input field={f[:price]} type="number" label="Price (KES)" placeholder="Enter amount" required />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-gray-100 pt-6">
+        <.input field={f[:type]} type="select" label="Listing Type"
+          options={[{"For Sale", "sale"}, {"For Rent", "rent"}]} />
+          
+        <.input field={f[:status]} type="select" label="Initial Status"
+          options={[{"Available", "available"}, {"Sold", "sold"}, {"Rented", "rented"}]} />
+      </div>
+
+      <%!-- Styled File Upload Section --%>
+      <div class="border-t border-gray-100 pt-6">
+        <label class="block text-sm font-bold text-gray-700 mb-2">Featured Property Image</label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-blue-400 transition-colors bg-gray-50/50">
+          <div class="space-y-1 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="flex text-sm text-gray-600">
+              <label for="file-upload" class="relative cursor-pointer bg-transparent rounded-md font-bold text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                <span>Upload a file</span>
+                <input id="file-upload" name="property[image]" type="file" class="sr-only" accept=".jpg,.jpeg,.png,.webp" />
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500">PNG, JPG, WEBP up to 10MB</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-4 border-t border-gray-100 pt-8">
+        <.link href={~p"/owner/properties"} class="text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">
+          Discard Changes
+        </.link>
+        
+        <.button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md shadow-blue-200 transition-all active:scale-95">
+          Publish Listing
+        </.button>
+      </div>
+
+    </.form>
+  </div>
 </div>

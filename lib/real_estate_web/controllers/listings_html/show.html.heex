@@ -1,140 +1,119 @@
-<%!-- Add this at the top of the listing card --%>
-<%= if @listing.image do %>
-  <img
-    src={RealEstate.Uploaders.PropertyImage.url({@listing.image, @listing}, :thumb)}
-    class="w-full h-48 object-cover rounded mb-4"
-  />
-<% else %>
-  <div class="w-full h-48 bg-gray-100 rounded mb-4 flex items-center justify-center">
-    <p class="text-gray-400 text-sm">No image</p>
-  </div>
-<% end %>
-
-<div class="max-w-2xl mx-auto px-6 py-10">
-  <.link href={~p"/listings"} class="text-sm text-gray-500 mb-6 inline-block">
-    ← Back to listings
+<%!-- lib/real_estate_web/controllers/listing_html/show.html.heex --%>
+<div class="max-w-5xl mx-auto px-6 py-12">
+  <.link href={~p"/listings"}
+    class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8 inline-flex items-center gap-2 hover:text-blue-600 transition-colors group">
+    <span class="group-hover:-translate-x-1 transition-transform">←</span> Back to Marketplace
   </.link>
-  <div class="border rounded-lg p-6">
-    <div class="flex items-center justify-between mb-4">
-      <span class={[
-        "text-xs px-2 py-0.5 rounded font-medium",
-        @listing.type == "sale" && "bg-blue-100 text-blue-700",
-        @listing.type == "rent" && "bg-green-100 text-green-700"
-      ]}>
-        {if @listing.type == "sale", do: "For Sale", else: "For Rent"}
-      </span> <span class="text-xs text-gray-400 capitalize">{@listing.status}</span>
-    </div>
-    
-    <h1 class="text-2xl font-bold mb-2">{@listing.title}</h1>
-    
-    <p class="text-gray-500 mb-4">{@listing.location}</p>
-    
-    <p class="text-3xl font-bold text-blue-600 mb-6">KES {@listing.price}</p>
-    
-    <%= if @listing.description do %>
-      <div class="border-t pt-4 mb-6">
-        <h2 class="font-semibold mb-2">Description</h2>
-        
-        <p class="text-gray-600 text-sm leading-relaxed">{@listing.description}</p>
+
+  <div class="bg-white rounded-3xl border shadow-xl shadow-gray-100/50 overflow-hidden mt-6">
+    <%!-- Hero Image Section --%>
+    <div class="relative h-[450px] w-full">
+      <%= if @listing.image do %>
+        <img
+          src={RealEstate.Uploaders.PropertyImage.url({@listing.image, @listing}, :original)}
+          class="w-full h-full object-cover"
+        />
+      <% else %>
+        <div class="w-full h-full bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 flex flex-col items-center justify-center">
+          <span class="text-7xl mb-4">🏘️</span>
+          <p class="text-gray-400 text-xs font-bold uppercase tracking-[0.3em]">No Image Available</p>
+        </div>
+      <% end %>
+
+      <%!-- Floating Status Badges --%>
+      <div class="absolute top-6 left-6 flex gap-2">
+        <span class={[
+          "text-[10px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest shadow-lg backdrop-blur-md",
+          @listing.type == "sale" && "bg-blue-600/90 text-white",
+          @listing.type == "rent" && "bg-emerald-600/90 text-white"
+        ]}>
+          {if @listing.type == "sale", do: "For Sale", else: "For Rent"}
+        </span>
+        <span class="text-[10px] bg-white/90 text-gray-900 px-4 py-1.5 rounded-full font-black uppercase tracking-widest shadow-lg backdrop-blur-md">
+          {@listing.status}
+        </span>
       </div>
-    <% end %>
-     <%!-- Enquire button — only for logged in buyers --%>
-    <div class="max-w-2xl mx-auto px-6 py-10">
-      <.link
-        href={~p"/listings"}
-        class="text-sm text-gray-500 hover:text-blue-600 mb-6 inline-block transition"
-      >
-        ← Back to listings
-      </.link>
-      <div class="bg-white shadow-sm border rounded-xl overflow-hidden">
-        <div class="p-8">
-          <div class="flex items-center justify-between mb-4">
-            <span class={[
-              "text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider",
-              @listing.type == "sale" && "bg-blue-100 text-blue-700",
-              @listing.type == "rent" && "bg-emerald-100 text-emerald-700"
-            ]}>
-              {if @listing.type == "sale", do: "For Sale", else: "For Rent"}
-            </span>
-            <span class="text-xs font-semibold text-gray-400 bg-gray-50 px-2 py-1 rounded uppercase">
-              {@listing.status}
-            </span>
+    </div>
+
+    <div class="p-10 md:p-12">
+      <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
+        <div class="flex-1 space-y-4">
+          <div>
+            <p class="text-blue-600 text-xs font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
+              <span class="text-base">📍</span> {@listing.location}
+            </p>
+            <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">{@listing.title}</h1>
           </div>
           
-          <h1 class="text-3xl font-extrabold text-gray-900 mb-2">{@listing.title}</h1>
-          
-          <p class="text-gray-500 flex items-center mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg> {@listing.location}
-          </p>
-          
-          <div class="bg-blue-50 p-4 rounded-lg mb-8">
-            <p class="text-sm text-blue-600 font-semibold uppercase">Price</p>
-            
-            <p class="text-4xl font-black text-blue-700">KES {@listing.price}</p>
+          <div class="inline-block bg-gray-50 border border-gray-100 px-6 py-3 rounded-2xl">
+            <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Asking Price</p>
+            <p class="text-4xl font-black text-gray-900">
+              <span class="text-xl font-bold text-blue-600 mr-1">KES</span>{Decimal.to_float(@listing.price)}
+            </p>
           </div>
-          
-          <%= if @listing.description do %>
-            <div class="border-t border-gray-100 pt-6 mb-8">
-              <h2 class="text-lg font-bold text-gray-900 mb-3">About this property</h2>
-              
-              <p class="text-gray-600 leading-relaxed">{@listing.description}</p>
-            </div>
-          <% end %>
-          
-          <div class="space-y-3">
-            <%= if assigns[:current_user] && assigns[:current_user].role == "buyer" do %>
+        </div>
+
+        <%!-- Action Sidebar/Section --%>
+        <div class="w-full lg:w-80">
+          <%= if assigns[:current_user] && assigns[:current_user].role == "buyer" do %>
+            <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 space-y-4 shadow-sm">
+              <h3 class="text-sm font-bold text-gray-900 mb-2">Interested in this property?</h3>
               <.link
                 href={~p"/buyer/enquiries/new?property_id=#{@listing.id}"}
-                class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold shadow-sm transition"
-              >
+                class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold transition shadow-lg shadow-blue-100 active:scale-95">
                 Send Enquiry
               </.link>
+              
               <form action={~p"/buyer/saved"} method="post">
                 <input type="hidden" name="_csrf_token" value={get_csrf_token()} />
                 <input type="hidden" name="property_id" value={@listing.id} />
-                <button
-                  type="submit"
-                  class="w-full border py-3 rounded font-medium text-gray-600 hover:bg-gray-50"
-                >
-                  Save Property
+                <button type="submit"
+                  class="w-full bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 py-4 rounded-2xl font-bold transition active:scale-95 flex items-center justify-center gap-2">
+                  <span class="text-rose-500">❤️</span> Save to Favorites
                 </button>
               </form>
-            <% else %>
-              <%= if !assigns[:current_user] do %>
-                <.link
-                  href={~p"/register"}
-                  class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-sm transition"
-                >
-                  Register to Enquire
-                </.link>
-                <p class="text-center text-sm text-gray-400 mt-2">
-                  Already have an account?
-                  <.link href={~p"/login"} class="text-indigo-600 font-semibold">Log in</.link>
-                </p>
-              <% end %>
-            <% end %>
-          </div>
+            </div>
+          <% else %>
+            <div class="bg-blue-900 rounded-3xl p-8 text-white space-y-6 shadow-xl shadow-blue-100">
+              <div class="space-y-2">
+                <h3 class="text-xl font-black tracking-tight leading-tight">Start your journey today</h3>
+                <p class="text-blue-200 text-xs leading-relaxed">Join our marketplace to contact agents, schedule viewings, and save listings.</p>
+              </div>
+              <.link
+                href={~p"/register"}
+                class="block text-center bg-white text-blue-900 py-4 rounded-2xl font-black transition hover:bg-blue-50 active:scale-95 text-sm uppercase tracking-widest">
+                Create Account
+              </.link>
+              <p class="text-[10px] text-blue-300 text-center uppercase font-bold tracking-widest">
+                Already a member? <.link href={~p"/login"} class="text-white hover:underline">Log in</.link>
+              </p>
+            </div>
+          <% end %>
         </div>
       </div>
+
+      <%!-- Property Details Section --%>
+      <%= if @listing.description do %>
+        <div class="mt-12 pt-10 border-t border-gray-100">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-xl">📄</span>
+            <h2 class="text-xl font-black text-gray-900 tracking-tight">Property Description</h2>
+          </div>
+          <div class="prose prose-blue max-w-none">
+            <p class="text-gray-600 text-lg leading-relaxed whitespace-pre-line">{@listing.description}</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%!-- Safety Note --%>
+  <div class="mt-8 flex justify-center">
+    <div class="flex items-center gap-3 bg-gray-50 px-6 py-3 rounded-full border border-gray-200">
+      <span class="text-lg">🛡️</span>
+      <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+        Verified Listing &middot; Professional Realtor Representation
+      </p>
     </div>
   </div>
 </div>

@@ -1,50 +1,94 @@
+<%!-- lib/real_estate_web/controllers/admin/enquiry_html/index.html.heex --%>
 <div class="p-6">
-  <h1 class="text-2xl font-semibold mb-6">All Enquiries</h1>
+  <div class="mb-8 flex justify-between items-end">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Global Enquiries</h1>
+      <p class="text-gray-500 text-sm mt-1">Audit and manage all communication between buyers, owners, and agents.</p>
+    </div>
+    <div class="bg-white px-4 py-2 rounded-xl border shadow-sm">
+      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest block">Total Volume</span>
+      <span class="text-xl font-black text-gray-900">{length(@enquiries)}</span>
+    </div>
+  </div>
 
   <%= if Enum.empty?(@enquiries) do %>
-    <p class="text-gray-400 text-center py-16">No enquiries yet.</p>
+    <div class="text-center py-24 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+      <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="text-4xl">📩</span>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900">No enquiries recorded</h3>
+      <p class="text-gray-500 max-w-xs mx-auto">Communication logs will appear here once buyers start reaching out about listings.</p>
+    </div>
   <% else %>
-    <table class="w-full text-sm border">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2 text-left">Property</th>
-          <th class="p-2 text-left">Buyer</th>
-          <th class="p-2 text-left">Message</th>
-          <th class="p-2 text-left">Status</th>
-          <th class="p-2 text-left">Date</th>
-          <th class="p-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr :for={enq <- @enquiries} class="border-t">
-          <td class="p-2"><%= enq.property.title %></td>
-          <td class="p-2"><%= enq.buyer.full_name || enq.buyer.email %></td>
-          <td class="p-2 max-w-xs truncate"><%= enq.message %></td>
-          <td class="p-2">
-            <span class={[
-              "text-xs px-2 py-0.5 rounded",
-              enq.status == "pending"  && "bg-yellow-100 text-yellow-700",
-              enq.status == "replied"  && "bg-green-100 text-green-700",
-              enq.status == "closed"   && "bg-gray-100 text-gray-500"
-            ]}>
-              <%= enq.status %>
-            </span>
-          </td>
-          <td class="p-2"><%= Calendar.strftime(enq.inserted_at, "%d %b %Y") %></td>
-          <td class="p-2 flex gap-3">
-            <.link href={~p"/admin/enquiries/#{enq.id}"} class="text-blue-600">
-              View
-            </.link>
-            <.link
-              href={~p"/admin/enquiries/#{enq.id}"}
-              method="delete"
-              data-confirm="Permanently delete this enquiry?"
-              class="text-red-600">
-              Delete
-            </.link>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="bg-gray-50 text-gray-500 text-[10px] uppercase tracking-widest border-b">
+              <th class="px-6 py-4 font-bold">Property Source</th>
+              <th class="px-6 py-4 font-bold">Buyer Details</th>
+              <th class="px-6 py-4 font-bold">Message Preview</th>
+              <th class="px-6 py-4 font-bold text-center">Status</th>
+              <th class="px-6 py-4 font-bold text-center">Date</th>
+              <th class="px-6 py-4 font-bold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr :for={enq <- @enquiries} class="hover:bg-gray-50/50 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  {enq.property.title}
+                </div>
+                <div class="text-[10px] text-gray-400 font-medium uppercase mt-0.5">
+                  ID: {enq.property.id}
+                </div>
+              </td>
+              
+              <td class="px-6 py-4">
+                <div class="font-medium text-gray-900">{enq.buyer.full_name || "Anonymous Buyer"}</div>
+                <div class="text-xs text-gray-500">{enq.buyer.email}</div>
+              </td>
+              
+              <td class="px-6 py-4">
+                <div class="text-gray-600 truncate max-w-[200px] italic bg-gray-50 px-2 py-1 rounded border-l-2 border-gray-200">
+                  "{enq.message}"
+                </div>
+              </td>
+              
+              <td class="px-6 py-4 text-center">
+                <span class={[
+                  "text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-tight shadow-sm border",
+                  enq.status == "pending" && "bg-amber-50 text-amber-700 border-amber-100",
+                  enq.status == "replied" && "bg-emerald-50 text-emerald-700 border-emerald-100",
+                  enq.status == "closed"  && "bg-gray-100 text-gray-500 border-gray-200"
+                ]}>
+                  {enq.status}
+                </span>
+              </td>
+              
+              <td class="px-6 py-4 text-center text-gray-400 text-xs font-medium">
+                {Calendar.strftime(enq.inserted_at, "%d %b %Y")}
+              </td>
+
+              <td class="px-6 py-4 text-right">
+                <div class="flex justify-end items-center gap-2">
+                  <.link href={~p"/admin/enquiries/#{enq.id}"}
+                    class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Audit">
+                    🔍
+                  </.link>
+                  <.link
+                    href={~p"/admin/enquiries/#{enq.id}"}
+                    method="delete"
+                    data-confirm="Admin Action: Permanent deletion of this enquiry log. Continue?"
+                    class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete Log">
+                    🗑️
+                  </.link>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   <% end %>
 </div>

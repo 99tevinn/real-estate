@@ -1,78 +1,141 @@
-<div class="max-w-6xl mx-auto px-6 py-10">
-  <h1 class="text-2xl font-semibold mb-6">Available Properties</h1>
-   <%!-- Filters --%>
-  <form action={~p"/listings"} method="get" class="flex flex-wrap gap-3 mb-8">
-    <select name="type" class="border rounded px-3 py-2 text-sm">
-      <option value="">All Types</option>
+<%!-- lib/real_estate_web/controllers/listing_html/index.html.heex --%>
+<div class="max-w-7xl mx-auto px-6 py-12">
+  <div class="mb-10">
+    <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-2">Available Properties</h1>
+    
+    <p class="text-gray-500 font-medium">Explore our curated selection of premier real estate.</p>
+  </div>
+   <%!-- Enhanced Filter Bar --%>
+  <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-4 mb-10">
+    <form action={~p"/listings"} method="get" class="flex flex-col md:flex-row items-center gap-4">
+      <div class="w-full md:w-auto">
+        <select
+          name="type"
+          class="w-full bg-gray-50 border-transparent rounded-2xl px-4 py-3 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+        >
+          <option value="">All Categories</option>
+          
+          <option value="sale" selected={@filters["type"] == "sale"}>🏠 For Sale</option>
+          
+          <option value="rent" selected={@filters["type"] == "rent"}>🔑 For Rent</option>
+        </select>
+      </div>
       
-      <option value="sale" selected={@filters["type"] == "sale"}>For Sale</option>
+      <div class="w-full relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">📍</span>
+        <input
+          type="text"
+          name="location"
+          value={@filters["location"]}
+          placeholder="Search by neighborhood or city..."
+          class="w-full bg-gray-50 border-transparent rounded-2xl pl-10 pr-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+        />
+      </div>
       
-      <option value="rent" selected={@filters["type"] == "rent"}>For Rent</option>
-    </select>
-    <input
-      type="text"
-      name="location"
-      value={@filters["location"]}
-      placeholder="Search by location..."
-      class="border rounded px-3 py-2 text-sm w-64"
-    />
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Search</button>
-    <a href={~p"/listings"} class="px-4 py-2 text-sm text-gray-500">Clear</a>
-  </form>
-   <%!-- Results --%>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <button
+          type="submit"
+          class="flex-1 md:flex-none bg-blue-600 text-white px-8 py-3 rounded-2xl text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95"
+        >
+          Search
+        </button>
+        <.link
+          href={~p"/listings"}
+          class="bg-gray-100 text-gray-500 px-4 py-3 rounded-2xl text-sm font-bold hover:bg-gray-200 transition-all"
+        >
+          Clear
+        </.link>
+      </div>
+    </form>
+  </div>
+   <%!-- Results Grid --%>
   <%= if Enum.empty?(@listings) do %>
-    <p class="text-gray-400 text-center py-16">No properties found.</p>
+    <div class="flex flex-col items-center justify-center py-24 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+      <span class="text-5xl mb-4">🏜️</span>
+      <h3 class="text-lg font-bold text-gray-900">No properties match your search</h3>
+      
+      <p class="text-gray-500 text-sm mt-1">Try adjusting your filters or clearing the search.</p>
+    </div>
   <% else %>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div :for={prop <- @listings} class="border rounded-lg overflow-hidden">
-        <%!-- Image --%>
-        <%= if prop.image do %>
-          <img
-            src={RealEstate.Uploaders.PropertyImage.url({prop.image, prop}, :thumb)}
-            class="w-full h-40 object-cover"
-          />
-        <% else %>
-          <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
-            <p class="text-gray-400 text-sm">No image</p>
-          </div>
-        <% end %>
-        
-        <div class="p-4">
-          <div class="flex items-center justify-between mb-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div
+        :for={prop <- @listings}
+        class="group bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 overflow-hidden flex flex-col"
+      >
+        <%!-- Image Container --%>
+        <div class="relative h-56 overflow-hidden">
+          <%= if prop.image do %>
+            <img
+              src={RealEstate.Uploaders.PropertyImage.url({prop.image, prop}, :thumb)}
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          <% else %>
+            <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+              <span class="text-4xl grayscale opacity-30">🏠</span>
+            </div>
+          <% end %>
+          
+          <div class="absolute top-4 left-4">
             <span class={[
-              "text-xs px-2 py-0.5 rounded font-medium",
-              prop.type == "sale" && "bg-blue-100 text-blue-700",
-              prop.type == "rent" && "bg-green-100 text-green-700"
+              "text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest shadow-sm backdrop-blur-md",
+              prop.type == "sale" && "bg-blue-600/90 text-white",
+              prop.type == "rent" && "bg-emerald-600/90 text-white"
             ]}>
               {if prop.type == "sale", do: "For Sale", else: "For Rent"}
             </span>
           </div>
+        </div>
+         <%!-- Content --%>
+        <div class="p-6 flex-1 flex flex-col">
+          <div class="flex-1 mb-4">
+            <p class="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+              {prop.location}
+            </p>
+            
+            <h3 class="font-extrabold text-gray-900 text-xl tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+              {prop.title}
+            </h3>
+          </div>
           
-          <h3 class="font-semibold text-base mb-1">{prop.title}</h3>
-          
-          <p class="text-gray-500 text-sm mb-1">{prop.location}</p>
-          
-          <p class="text-lg font-bold mb-3">KES {prop.price}</p>
-          
-          <p class="text-xs text-gray-400 mb-3">
-            Listed by {prop.owner.full_name || prop.owner.email}
-          </p>
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-gray-400 text-[9px] font-bold uppercase tracking-widest">
+                Guide Price
+              </p>
+              
+              <p class="text-2xl font-black text-gray-900">
+                <span class="text-sm font-bold text-blue-600 mr-0.5">KES</span>{Decimal.to_float(
+                  prop.price
+                )}
+              </p>
+            </div>
+            
+            <div class="text-right">
+              <p class="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Agent</p>
+              
+              <p class="text-[11px] font-bold text-gray-700 truncate max-w-[100px]">
+                {prop.owner.full_name || prop.owner.email}
+              </p>
+            </div>
+          </div>
           
           <.link
             href={~p"/listings/#{prop.id}"}
-            class="block text-center bg-gray-100 hover:bg-gray-200 text-sm py-2 rounded"
+            class="w-full text-center bg-gray-900 text-white text-xs font-black uppercase tracking-[0.2em] py-4 rounded-2xl hover:bg-blue-600 transition-all shadow-md shadow-gray-100"
           >
-            View Details
+            Explore Listing
           </.link>
         </div>
       </div>
     </div>
-     <%!-- Pagination --%>
-    <RealEstateWeb.Components.Pagination.pagination
-      path={~p"/listings"}
-      params={@filters}
-      page_number={@page_number}
-      total_pages={@total_pages}
-    />
+     <%!-- Pagination Section --%>
+    <div class="mt-16 pt-10 border-t border-gray-100">
+      <RealEstateWeb.Components.Pagination.pagination
+        path={~p"/listings"}
+        params={@filters}
+        page_number={@page_number}
+        total_pages={@total_pages}
+      />
+    </div>
   <% end %>
 </div>

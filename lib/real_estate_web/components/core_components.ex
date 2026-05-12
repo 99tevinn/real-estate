@@ -502,4 +502,21 @@ defmodule RealEstateWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  attr :href, :string, required: true
+  attr :icon, :string, required: true
+  attr :label, :string, required: true
+
+  def sidebar_link(assigns) do
+    ~H"""
+    <.link
+      href={@href}
+      class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400
+             hover:text-white hover:bg-gray-700 transition text-sm"
+    >
+      <span class="text-base">{@icon}</span>
+      <span>{@label}</span>
+    </.link>
+    """
+  end
 end

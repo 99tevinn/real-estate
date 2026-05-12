@@ -1,4 +1,3 @@
-# lib/real_estate_web/live/owner/dashboard_live.ex
 defmodule RealEstateWeb.Owner.DashboardLive do
   use RealEstateWeb, :live_view
   alias RealEstate.Properties
@@ -7,6 +6,7 @@ defmodule RealEstateWeb.Owner.DashboardLive do
     if connected?(socket) do
       Phoenix.PubSub.subscribe(RealEstate.PubSub, "enquiries")
     end
+
     {:ok, load_data(socket)}
   end
 
@@ -16,9 +16,12 @@ defmodule RealEstateWeb.Owner.DashboardLive do
 
   defp load_data(socket) do
     owner_id = socket.assigns.current_user.id
+    properties_result = Properties.list_owner_properties(owner_id)
+    enquiries_result = Properties.list_owner_enquiries(owner_id)
+
     assign(socket,
-      properties: Properties.list_owner_properties(owner_id),
-      enquiries:  Properties.list_owner_enquiries(owner_id)
+      properties: if(is_map(properties_result), do: properties_result.entries, else: properties_result),
+      enquiries: enquiries_result
     )
   end
 end
