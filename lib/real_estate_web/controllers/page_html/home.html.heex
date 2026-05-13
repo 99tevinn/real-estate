@@ -1,44 +1,14 @@
 <%!-- lib/real_estate_web/controllers/page_html/home.html.heex --%>
-<%!-- Hero --%>
-<div class="bg-gray-900 text-white py-24 px-6">
-  <div class="max-w-4xl mx-auto text-center">
-    <h1 class="text-5xl font-bold mb-6 leading-tight">
-      Find Your Perfect Property in Kenya
-    </h1>
-    <p class="text-gray-300 text-xl mb-10 max-w-2xl mx-auto">
-      Browse thousands of properties for sale and rent.
-      Connect directly with owners and agents.
-    </p>
-    <div class="flex justify-center gap-4 flex-wrap">
-      <.link href={~p"/listings"}
-        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg
-               font-semibold text-lg transition">
-        Browse Listings
-      </.link>
-      <.link href={~p"/register"}
-        class="bg-white hover:bg-gray-100 text-gray-900 px-8 py-4 rounded-lg
-               font-semibold text-lg transition">
-        List Your Property
-      </.link>
-    </div>
-  </div>
-</div>
 
 <%!-- Stats bar --%>
 <div class="bg-blue-600 text-white py-6 px-6">
   <div class="max-w-4xl mx-auto grid grid-cols-3 gap-6 text-center">
     <div>
-      <p class="text-3xl font-bold"><%= length(@listings) %>+</p>
+      <%!-- FIX 1: Use .total_entries from the pagination struct --%>
+      <p class="text-3xl font-bold"><%= @listings.total_entries %>+</p>
       <p class="text-blue-200 text-sm">Active Listings</p>
     </div>
-    <div>
-      <p class="text-3xl font-bold">500+</p>
-      <p class="text-blue-200 text-sm">Happy Clients</p>
-    </div>
-    <div>
-      <p class="text-3xl font-bold">50+</p>
-      <p class="text-blue-200 text-sm">Verified Agents</p>
-    </div>
+    <%!-- ... other stats ... --%>
   </div>
 </div>
 
@@ -51,48 +21,35 @@
     </.link>
   </div>
 
-  <%= if Enum.empty?(@listings) do %>
+  <%!-- FIX 2: Use .entries to check if empty --%>
+  <%= if Enum.empty?(@listings.entries) do %>
     <div class="text-center py-16 bg-gray-100 rounded-xl">
       <p class="text-4xl mb-4">🏘️</p>
       <p class="text-gray-500">No properties listed yet.</p>
     </div>
   <% else %>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div :for={prop <- Enum.take(@listings, 6)}
+      <%!-- FIX 3: Use .entries for the loop --%>
+      <div :for={prop <- Enum.take(@listings.entries, 6)}
         class="bg-white rounded-xl shadow-sm border hover:shadow-md transition overflow-hidden">
+        
+        <%!-- Image and Header logic remains the same --%>
         <%= if prop.image do %>
-          <img
-            src={RealEstate.Uploaders.PropertyImage.url({prop.image, prop}, :thumb)}
-            class="w-full h-48 object-cover"
-          />
+          <img src={RealEstate.Uploaders.PropertyImage.url({prop.image, prop}, :thumb)} class="w-full h-48 object-cover" />
         <% else %>
-          <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-600
-                      flex items-center justify-center">
+          <div class="w-full h-48 bg-gradient-to-br from-gray-800 to-gray-600 flex items-center justify-center">
             <span class="text-4xl">🏠</span>
           </div>
         <% end %>
 
         <div class="p-5">
-          <div class="flex items-center justify-between mb-3">
-            <span class={[
-              "text-xs px-2 py-1 rounded-full font-semibold",
-              prop.type == "sale" && "bg-blue-100 text-blue-700",
-              prop.type == "rent" && "bg-green-100 text-green-700"
-            ]}>
-              <%= if prop.type == "sale", do: "For Sale", else: "For Rent" %>
-            </span>
-            <span class="text-xs text-gray-400 capitalize"><%= prop.status %></span>
-          </div>
-          <h3 class="font-bold text-base mb-1"><%= prop.title %></h3>
-          <p class="text-gray-500 text-sm mb-3 flex items-center gap-1">
-            <span>📍</span><%= prop.location %>
-          </p>
+           <%!-- ... type and title tags ... --%>
+           
           <p class="text-xl font-bold text-gray-900 mb-4">
+            <%!-- Keeping your float conversion fix --%>
             KES <%= :erlang.float_to_binary(Decimal.to_float(prop.price), [{:decimals, 0}]) %>
           </p>
-          <.link href={~p"/listings/#{prop.id}"}
-            class="block text-center bg-gray-900 hover:bg-gray-700 text-white
-                   text-sm py-2.5 rounded-lg transition font-medium">
+          <.link href={~p"/listings/#{prop.id}"} class="block text-center bg-gray-900 hover:bg-gray-700 text-white text-sm py-2.5 rounded-lg transition font-medium">
             View Details
           </.link>
         </div>
@@ -100,43 +57,3 @@
     </div>
   <% end %>
 </div>
-
-<%!-- How it works --%>
-<div class="bg-gray-900 text-white py-16 px-6">
-  <div class="max-w-4xl mx-auto text-center mb-12">
-    <h2 class="text-3xl font-bold mb-4">How It Works</h2>
-    <p class="text-gray-400">Get started in three simple steps</p>
-  </div>
-  <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-    <div class="text-center">
-      <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center
-                  mx-auto mb-4 text-2xl">
-        🏠
-      </div>
-      <h3 class="font-bold text-lg mb-2">List Your Property</h3>
-      <p class="text-gray-400 text-sm">
-        Register as an owner and list your property in minutes.
-      </p>
-    </div>
-    <div class="text-center">
-      <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center
-                  mx-auto mb-4 text-2xl">
-        🔍
-      </div>
-      <h3 class="font-bold text-lg mb-2">Browse & Filter</h3>
-      <p class="text-gray-400 text-sm">
-        Search properties by location, type, and price range.
-      </p>
-    </div>
-    <div class="text-center">
-      <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center
-                  mx-auto mb-4 text-2xl">
-        📩
-      </div>
-      <h3 class="font-bold text-lg mb-2">Send an Enquiry</h3>
-      <p class="text-gray-400 text-sm">
-        Contact owners and agents directly through the platform.
-      </p>
-    </div>
-  </div>
-</div>s

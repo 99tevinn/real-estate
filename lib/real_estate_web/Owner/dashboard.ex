@@ -16,12 +16,12 @@ defmodule RealEstateWeb.Owner.DashboardLive do
 
   defp load_data(socket) do
     owner_id = socket.assigns.current_user.id
-    properties_result = Properties.list_owner_properties(owner_id)
-    enquiries_result = Properties.list_owner_enquiries(owner_id)
+    properties_page = Properties.list_owner_properties(owner_id)
+    enquiries_list = Properties.list_owner_enquiries(owner_id)
 
     assign(socket,
-      properties: if(is_map(properties_result), do: properties_result.entries, else: properties_result),
-      enquiries: enquiries_result
+      properties: properties_page.entries,
+      enquiries: enquiries_list
     )
   end
 end
