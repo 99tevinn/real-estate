@@ -12,9 +12,9 @@ defmodule RealEstate.Properties.SavedListing do
   @doc false
   def changeset(saved_listing, attrs) do
     saved_listing
-    |> cast(attrs, [:buyer_id, :property_id])
-    |> validate_required([:buyer_id, :property_id])
-    |> unique_constraint([:buyer_id, :property_id],
+    |> cast(attrs, [:user_id, :property_id])
+    |> validate_required([:user_id, :property_id])
+    |> unique_constraint([:user_id, :property_id],
       message: "Property already saved"
     )
   end

@@ -9,6 +9,7 @@ defmodule RealEstateWeb.PasswordResetController do
   end
 
   def create(conn, %{"email" => email}) do
+    # 1. Fetch the user by email from the database
     case Accounts.get_user_by_email(email) do
       nil ->
         conn
@@ -16,14 +17,27 @@ defmodule RealEstateWeb.PasswordResetController do
         |> redirect(to: ~p"/password_reset/new")
 
       %User{} = user ->
-        Accounts.create_password_reset_token(user)
+        case Accounts.create_password_reset_token(user) do
+          {:ok, updated_user} ->
+            # 3. Generate the URL using the UPDATED user (token is now present)
+            reset_url = url(conn, ~p"/password_reset/#{updated_user.reset_password_token}")
 
-        reset_url = url(~p"/password_reset/#{user.reset_password_token}")
-        RealEstate.Mailer.Notifier.send_password_reset(user, reset_url)
+            # 4. Send the email using the updated user data
+            RealEstate.Mailer.Notifier.send_password_reset(updated_user, reset_url)
 
-        conn
-        |> put_flash(:info, "If an account with that email exists, a reset link has been sent.")
-        |> redirect(to: ~p"/login")
+            conn
+            |> put_flash(
+              :info,
+              "If an account with that email exists, a reset link has been sent."
+            )
+            |> redirect(to: ~p"/login")
+
+          {:error, _changeset} ->
+            # Handle potential database update failures
+            conn
+            |> put_flash(:error, "Something went wrong. Please try again.")
+            |> redirect(to: ~p"/password_reset/new")
+        end
     end
   end
 

@@ -38,9 +38,9 @@ defmodule RealEstate.Mailer.Notifier do
   end
 
   # lib/real_estate/mailer/notifier.ex — add this function
-  def send_password_reset(email, reset_url) do
+  def send_password_reset(user, reset_url) do
     new()
-    |> to(email)
+    |> to(user.email)
     |> from({"RealEstate App", "noreply@realestate.com"})
     |> subject("Reset Your Password")
     |> html_body("""

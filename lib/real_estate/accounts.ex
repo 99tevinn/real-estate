@@ -30,8 +30,6 @@ defmodule RealEstate.Accounts do
           {:error, :not_found}
       end
 
-    # This will tell us the result in the terminal
-    IO.inspect(result, label: "AUTH_RESULT")
     result
   end
 
@@ -80,10 +78,12 @@ defmodule RealEstate.Accounts do
     token =
       :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
 
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
     user
     |> Ecto.Changeset.change(
       reset_password_token: token,
-      reset_password_sent_at: DateTime.utc_now()
+      reset_password_sent_at: now
     )
     |> Repo.update()
   end

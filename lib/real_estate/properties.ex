@@ -223,7 +223,7 @@ defmodule RealEstate.Properties do
 
   def list_saved_listings(buyer_id) do
     SavedListing
-    |> where([s], s.buyer_id == ^buyer_id)
+    |> where([s], s.user_id == ^buyer_id)
     |> preload(:property)
     |> Repo.all()
   end
@@ -236,7 +236,7 @@ defmodule RealEstate.Properties do
 
   def unsave_listing(buyer_id, property_id) do
     SavedListing
-    |> where([s], s.buyer_id == ^buyer_id and s.property_id == ^property_id)
+    |> where([s], s.user_id == ^buyer_id and s.property_id == ^property_id)
     |> Repo.one()
     |> case do
       nil -> {:error, :not_found}

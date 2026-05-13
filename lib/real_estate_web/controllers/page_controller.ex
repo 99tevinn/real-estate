@@ -2,8 +2,8 @@ defmodule RealEstateWeb.PageController do
   use RealEstateWeb, :controller
   alias RealEstate.Properties
 
-  def home(conn, _params) do
-    listings = Properties.list_available_properties()
+  def home(conn, params) do
+    listings = Properties.search_properties(params)
     render(conn, :home, listings: listings)
   end
 end
