@@ -19,7 +19,7 @@ defmodule RealEstate.Properties do
     |> preload(:owner)
     |> Repo.paginate(page: page)
   end
-
+  
   def list_available_properties do
     Property
     |> where([p], p.status == "available")

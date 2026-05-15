@@ -7,6 +7,7 @@ defmodule RealEstateWeb.Agent.DashboardLive do
       Phoenix.PubSub.subscribe(RealEstate.PubSub, "enquiries")
       Phoenix.PubSub.subscribe(RealEstate.PubSub, "properties")
     end
+
     {:ok, load_data(socket)}
   end
 
@@ -16,7 +17,7 @@ defmodule RealEstateWeb.Agent.DashboardLive do
 
   defp load_data(socket) do
     assign(socket,
-      listings:          Properties.list_agent_listings(socket.assigns.current_user.id),
+      listings: Properties.list_agent_listings(socket.assigns.current_user.id),
       pending_enquiries: Properties.list_pending_enquiries()
     )
   end

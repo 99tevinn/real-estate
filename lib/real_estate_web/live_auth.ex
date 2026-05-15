@@ -26,7 +26,7 @@ defmodule RealEstateWeb.LiveAuth do
 
       user ->
         if Enum.member?(allowed_roles, user.role) do
-          {:cont, assign(socket, :current_user, user)}
+          {:cont, assign_new(socket, :current_user, fn -> user end)}
         else
           {:halt, redirect(socket, to: "/login")}
         end
