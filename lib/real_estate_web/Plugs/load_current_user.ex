@@ -17,3 +17,4 @@ defmodule RealEstateWeb.Plugs.LoadCurrentUser do
     end
   end
 end
+ 
